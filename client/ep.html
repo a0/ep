@@ -1,0 +1,152 @@
+<head>
+    <meta charset="utf-8">
+    <title>EtherPlan</title>
+</head>
+<body>{{> table}}</body>
+
+<template name="table">
+    <table>
+        <tr>
+            <td colspan="4" id="banner">
+                <span id="banner-ether">Ether</span><span id="banner-gantt">Plan</span>
+            </td>
+        </tr>
+        {{#if hasDoc}} 
+        <tr>
+            <th>#</th>
+            <th>Part</th>
+            <th>Start</th>
+            <th>Length</th>
+        </tr>
+            {{#if hasParts}} 
+            {{else}} 
+                {{> entryNew}} 
+            {{/if}} 
+            {{#each parts}} 
+                {{> part}}
+            {{/each}}
+        {{else}} 
+        <tr>
+            <td colspan="3">
+                <div id="inner">
+                    <div id="newPlan" onclick="EtherPlan.Helper.go_random()">New Plan</div>
+                    <br /><br />
+                    or create/open a plan with the name
+                    <form action="#" id="formCreate" onsubmit="EtherPlan.Helper.go_name();return false;"> 
+                        <input type="text" id="planName"> 
+                        <button type="submit" id="ok">OK</button>
+                    </form>
+                </div>
+            </td>
+            </td>
+        </tr>
+        {{/if}} 
+    </table>
+</template>
+
+<template name="part">
+    {{#if editing}} 
+        {{> edit}} 
+    {{else}} 
+        {{> show}} 
+    {{/if}}
+    {{#if adding}}
+        {{> entry}}
+    {{/if}}
+</template>
+
+<template name="show">
+    <tr{{#if isGroup}} class="isGroup" {{/if}}>
+        <td class="order showOrder">{{ order }}</td>
+        <td class="showLabel">{{ spaceLabel this }}{{ label }}</td>
+        <td class="start showStart">{{ start }}</td>
+        <td class="value showValue">{{ value }}</td>
+    </tr>
+</template>
+
+<template name="edit">
+    <tr class="editRow{{#if isGroup}} isGroup{{/if}}">
+        <td class="order">&nbsp;</td>
+        <td>{{ spaceLabel this }}<input type="text" size="15" id="editLabel" value="{{ label }}" />
+            <button id="editSend">Ok</button>
+            <button id="editCancel">No</button>
+            {{#if hasParent}}<button id="addBrother">&nbsp;+&nbsp;</button>{{/if}}
+            <button id="addChild">&nbsp;++&nbsp;</button>
+            {{#if couldInline}}<button id="moveInline">&lt;&lt;</button>{{/if}}
+            {{#if couldUp}}<button id="moveUp">Up</button>{{/if}}
+            {{#if couldDown}}<button id="moveDown">Down</button>{{/if}}
+            {{#if couldOutline}}<button id="moveOutline">&gt;&gt;</button>{{/if}}
+            <button id="remove">X</button>
+            {{#if showOptions}}<button id="hideOptions">less</button>{{else}}<button id="showOptions">more</button>{{/if}}
+        </td>
+        <td class="start"><input type="text" size="7" id="editStart" value="{{ start }}" onchange="EtherPlan.Helper.edit_update_finish()" /></td>
+        <td class="value"><input type="text" size="2" id="editValue" value="{{ value }}" onchange="EtherPlan.Helper.edit_update_finish()" /></td>
+    </tr>
+    {{#if showOptions}}
+    <tr class="editRow{{#if isGroup}} isGroup{{/if}}">
+        <td class="order">&nbsp;</td>
+        <td colspan="3">{{ spaceLabel this }}<span id="finish">Finish: 
+            <input type="text" size="10" id="editFinish" value="{{ finish }}" onchange="EtherPlan.Helper.edit_update_value()" />
+            </span>
+            {{#if couldPredecessors}}
+            Predecessors: 
+            <input type="text" size="20" id="editPredecessors" value="{{ predecessors }}" />
+            {{else}}
+            <input type="hidden" id="editPredecessors" value="{{ predecessors }}" />
+            {{/if}}
+            {{#if couldMoveTo}}<button id="moveTo">Move to:</button> <input type="text" size="2" id="newOrder" />{{/if}}
+            {{#if showDebug}}<button id="hideDebug">Hide Debug</button>{{else}}<button id="showDebug">Show Debug</button>{{/if}}
+        </td>
+    </tr>
+    {{else}}
+            <input type="hidden" id="editFinish" value="{{ finish }}" onchange="EtherPlan.Helper.edit_update_value()" />
+            <input type="hidden" id="editPredecessors" value="{{ predecessors }}" />
+    {{/if}}
+    {{#if showDebug}}
+    <tr class="editRow">
+        <td class="order">&nbsp;</td>
+        <td colspan="5">
+            <small>
+            <ol>
+                <li>id: {{_id}}</li>
+                <li>level: {{level}}</li>
+                <li>parent: {{parent}}</li>
+                <li>timestampCreated: {{timestampCreated}}</li> 
+                <li>timestampUpdated: {{timestampUpdated}}</li> 
+            </ol>
+            </small>
+        </td>
+    </tr>
+    {{/if}}
+</template>
+
+<template name="entry">
+    <tr class="entryRow">
+        <td class="order">&nbsp;</td>
+        <td>{{ spaceLabelEntry this }}<input type="text" size="15" id="entryLabel" value="Part {{ sizeTable }}"/>
+            Finish:
+            <input type="text" size="10" id="entryFinish" value="{{finish}}" onchange="EtherPlan.Helper.entry_update_value()" />
+            <input type="hidden" id="entryParent" value="{{ _id }}" />
+            <input type="hidden" size="2" id="entryPredecessors" value="{{ predecessors }}" />
+            <button id="entrySend">Ok</button>
+            <button id="entrySendPlus">Ok +</button>
+            <button id="entrySendPlusPlus">Ok ++</button>
+            <button id="entryCancel">No</button>
+        </td>
+        <td class="start"><input type="text" size="7" id="entryStart" value="{{start}}" onchange="EtherPlan.Helper.entry_update_finish()" /></td>
+        <td class="value"><input type="text" size="2" id="entryValue" value="1" onchange="EtherPlan.Helper.entry_update_finish()" /></td>
+    </tr>
+</template>
+
+<template name="entryNew">
+    <tr class="entryRow">
+        <td class="order">&nbsp;</td>
+        <td colspan="3"><input type="text"  size="15" id="entryLabel" value="WHOLE" />
+            <input type="hidden" id="entryValue" value="0" />
+            <input type="hidden" id="entryParent" value="" />
+            <input type="hidden" id="entryStart" value="{{start}}" />
+            <input type="hidden" id="entryFinish" value="{{finish}}" />
+            <button id="entryNewSend">ok</button>
+        </td>
+    </tr>
+</template>
