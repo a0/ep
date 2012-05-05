@@ -5,18 +5,13 @@
 <body>{{> table}}</body>
 
 <template name="table">
-    <table>
-        <tr>
-            <td colspan="4" id="banner">
-                <span id="banner-ether">Ether</span><span id="banner-gantt">Plan</span>
-            </td>
-        </tr>
+    <table id="parts">
         {{#if hasDoc}} 
         <tr>
-            <th>#</th>
-            <th>Part</th>
-            <th>Start</th>
-            <th>Length</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
         </tr>
             {{#if hasParts}} 
             {{else}} 
@@ -42,6 +37,18 @@
         </tr>
         {{/if}} 
     </table>
+    <div id="banner"><span id="banner-ether">Ether</span><span id="banner-gantt">Plan</span></div>
+    <table id="headers">
+        {{#if hasDoc}} 
+        <tr>
+            <th id="headerOrder">#</th>
+            <th>PART</th>
+            <th id="headerStart">START</th>
+            <th id="headerValue">LENGTH</th>
+        </tr>
+        {{/if}} 
+    </table>
+    <a class="madewith_badge" href="http://madewith.meteor.com/ep" target="_blank">&nbsp;</a>
 </template>
 
 <template name="part">
