@@ -85,10 +85,10 @@ EtherPlan.Action.entryCancel = function () {
 }
 
 Template.entry.events = {
-    'click #entrySend': EtherPlan.Action.entrySend,
+    'click #iconActionCheckEntry': EtherPlan.Action.entrySend,
     'click #entrySendPlus': EtherPlan.Action.entrySendPlus,
     'click #entrySendPlusPlus': EtherPlan.Action.entrySendPlusPlus,
-    'click #entryCancel': EtherPlan.Action.entryCancel
+    'click #iconActionXEntry': EtherPlan.Action.entryCancel
 };
 
 Template.entry.events[EtherPlan.Helper.okcancel_events('')] = EtherPlan.Helper.make_okcancel_handler({

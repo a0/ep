@@ -5,14 +5,14 @@
 <body>{{> table}}</body>
 
 <template name="table">
-    <table id="parts">
+    <table id="parts" class="unselectable">
         {{#if hasDoc}} 
-        <tr>
-            <th>&nbsp;</th>
-            <th>&nbsp;</th>
-            <th>&nbsp;</th>
-            <th>&nbsp;</th>
-        </tr>
+            <tr>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+            </tr>
             {{#if hasParts}} 
             {{else}} 
                 {{> entryNew}} 
@@ -21,34 +21,46 @@
                 {{> part}}
             {{/each}}
         {{else}} 
-        <tr>
-            <td colspan="3">
-                <div id="inner">
-                    <div id="newPlan" onclick="EtherPlan.Helper.go_random()">New Plan</div>
-                    <br /><br />
-                    or create/open a plan with the name
-                    <form action="#" id="formCreate" onsubmit="EtherPlan.Helper.go_name();return false;"> 
-                        <input type="text" id="planName"> 
-                        <button type="submit" id="ok">OK</button>
-                    </form>
-                </div>
-            </td>
-            </td>
-        </tr>
+            <tr>
+                <td colspan="3">
+                    <div id="inner">
+                        <div id="newPlan" onclick="EtherPlan.Helper.go_random()">New Plan</div>
+                        <br /><br />
+                        or create/open a plan with the name
+                        <form action="#" id="formCreate" onsubmit="EtherPlan.Helper.go_name();return false;"> 
+                            <input type="text" id="planName"> 
+                            <button type="submit" id="ok">OK</button>
+                        </form>
+                    </div>
+                </td>
+                </td>
+            </tr>
         {{/if}} 
     </table>
-    <div id="banner"><span id="banner-ether">Ether</span><span id="banner-gantt">Plan</span></div>
-    <table id="headers">
-        {{#if hasDoc}} 
-        <tr>
-            <th id="headerOrder">#</th>
-            <th>PART</th>
-            <th id="headerStart">START</th>
-            <th id="headerValue">LENGTH</th>
-        </tr>
+    <div id="banner" class="unselectable"><span id="banner-ether">Ether</span><span id="banner-gantt">Plan</span></div>
+    {{#if hasDoc}} 
+        {{#if hasParts}} 
+            <table id="headers" class="unselectable">
+            <tr>
+                <th id="headerOrder">#</th>
+                <th>PART</th>
+                <th id="headerStart">START</th>
+                <th id="headerValue">LENGTH</th>
+            </tr>
+            </table>
+            <span id="iconActionPlusDefault" class="icon">&nbsp;</span>
+            <span id="iconMinus" class="icon">&nbsp;</span>
+            <span id="iconArrowLeft" class="icon">&nbsp;</span>
+            <span id="iconArrowDown" class="icon">&nbsp;</span>
+            <span id="iconArrowUp" class="icon">&nbsp;</span>
+            <span id="iconArrowRight" class="icon">&nbsp;</span>
+            <span id="iconCheck" class="icon">&nbsp;</span>
+            <span id="iconX" class="icon">&nbsp;</span>
         {{/if}} 
-    </table>
+    {{/if}} 
+    <span class="unselectable">
     <a class="madewith_badge" href="http://madewith.meteor.com/ep" target="_blank">&nbsp;</a>
+    </span>
 </template>
 
 <template name="part">
@@ -72,29 +84,31 @@
 </template>
 
 <template name="edit">
-    <tr class="editRow{{#if isGroup}} isGroup{{/if}}">
+    <tr class="editRow">
         <td class="order">&nbsp;</td>
         <td>{{ spaceLabel this }}<input type="text" size="15" id="editLabel" value="{{ label }}" />
-            <button id="editSend">Ok</button>
-            <button id="editCancel">No</button>
-            {{#if hasParent}}<button id="addBrother">&nbsp;+&nbsp;</button>{{/if}}
-            <button id="addChild">&nbsp;++&nbsp;</button>
-            {{#if couldInline}}<button id="moveInline">&lt;&lt;</button>{{/if}}
-            {{#if couldUp}}<button id="moveUp">Up</button>{{/if}}
-            {{#if couldDown}}<button id="moveDown">Down</button>{{/if}}
-            {{#if couldOutline}}<button id="moveOutline">&gt;&gt;</button>{{/if}}
-            <button id="remove">X</button>
-            {{#if showOptions}}<button id="hideOptions">less</button>{{else}}<button id="showOptions">more</button>{{/if}}
+            <span id="iconActionMinus" class="icon">&nbsp;</span>
+            {{#if hasParent}}
+                <span id="iconActionPlus" class="icon">&nbsp;</span>
+            {{else}}
+                <span id="iconActionPlusPlus" class="icon">&nbsp;</span>
+            {{/if}}
+            {{#if couldInline}}<span id="iconActionArrowLeft" class="icon">&nbsp;</span>{{/if}}
+            {{#if couldUp}}<span id="iconActionArrowUp" class="icon">&nbsp;</span>{{/if}}
+            {{#if couldDown}}<span id="iconActionArrowDown" class="icon">&nbsp;</span>{{/if}}
+            {{#if couldOutline}}<span id="iconActionArrowRight" class="icon">&nbsp;</span>{{/if}}
+            <span id="iconActionCheck" class="icon">&nbsp;</span>
+            <span id="iconActionX" class="icon">&nbsp;</span>
         </td>
         <td class="start"><input type="text" size="7" id="editStart" value="{{ start }}" onchange="EtherPlan.Helper.edit_update_finish()" /></td>
         <td class="value"><input type="text" size="2" id="editValue" value="{{ value }}" onchange="EtherPlan.Helper.edit_update_finish()" /></td>
     </tr>
     {{#if showOptions}}
-    <tr class="editRow{{#if isGroup}} isGroup{{/if}}">
+    <tr class="editRow">
         <td class="order">&nbsp;</td>
-        <td colspan="3">{{ spaceLabel this }}<span id="finish">Finish: 
-            <input type="text" size="10" id="editFinish" value="{{ finish }}" onchange="EtherPlan.Helper.edit_update_value()" />
-            </span>
+        <td colspan="3">{{ spaceLabel this }}
+            {{#if showOptions}}<button id="hideOptions">less</button>{{else}}<button id="showOptions">more</button>{{/if}}
+            <span id="finish">Finish:<input type="text" size="10" id="editFinish" value="{{ finish }}" onchange="EtherPlan.Helper.edit_update_value()" /></span>
             {{#if couldPredecessors}}
             Predecessors: 
             <input type="text" size="20" id="editPredecessors" value="{{ predecessors }}" />
@@ -130,15 +144,12 @@
 <template name="entry">
     <tr class="entryRow">
         <td class="order">&nbsp;</td>
-        <td>{{ spaceLabelEntry this }}<input type="text" size="15" id="entryLabel" value="Part {{ sizeTable }}"/>
-            Finish:
-            <input type="text" size="10" id="entryFinish" value="{{finish}}" onchange="EtherPlan.Helper.entry_update_value()" />
+        <td>{{ spaceLabelEntry this }}<input type="text" size="15" id="entryLabel" value="Part {{ sizeTable }}" />
+            <input type="hidden" id="entryFinish" value="{{finish}}" onchange="EtherPlan.Helper.entry_update_value()" />
             <input type="hidden" id="entryParent" value="{{ _id }}" />
             <input type="hidden" size="2" id="entryPredecessors" value="{{ predecessors }}" />
-            <button id="entrySend">Ok</button>
-            <button id="entrySendPlus">Ok +</button>
-            <button id="entrySendPlusPlus">Ok ++</button>
-            <button id="entryCancel">No</button>
+            <span id="iconActionCheckEntry" class="icon">&nbsp;</span>
+            <span id="iconActionXEntry" class="icon">&nbsp;</span>
         </td>
         <td class="start"><input type="text" size="7" id="entryStart" value="{{start}}" onchange="EtherPlan.Helper.entry_update_finish()" /></td>
         <td class="value"><input type="text" size="2" id="entryValue" value="1" onchange="EtherPlan.Helper.entry_update_finish()" /></td>
@@ -153,7 +164,7 @@
             <input type="hidden" id="entryParent" value="" />
             <input type="hidden" id="entryStart" value="{{start}}" />
             <input type="hidden" id="entryFinish" value="{{finish}}" />
-            <button id="entryNewSend">ok</button>
+            <span id="iconActionCheck" class="icon">&nbsp;</span>
         </td>
     </tr>
 </template>

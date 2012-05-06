@@ -45,18 +45,16 @@ EtherPlan.Action.remove = function () {
     Session.set('editing_part', null);
 }
 
-EtherPlan.Action.addChild = function () {
+EtherPlan.Action.addChild = function (evt) {
     Session.set('editing_part', null);
     Session.set('adding_part', this._id);
-    Meteor.flush();
-    EtherPlan.Helper.focus_field_by_id("entryLabel");
+    EtherPlan.Helper.flush_focus("entryLabel");
 }
 
-EtherPlan.Action.addBrother = function () {
+EtherPlan.Action.addBrother = function (evt) {
     Session.set('editing_part', null);
     Session.set('adding_brother_part', this._id);
-    Meteor.flush();
-    EtherPlan.Helper.focus_field_by_id("entryLabel");
+    EtherPlan.Helper.flush_focus("entryLabel");
 }
 
 EtherPlan.Action.up = function () {
@@ -90,16 +88,16 @@ EtherPlan.Action.hideDebug = function () {
 }
 
 Template.edit.events = {
-    'click #editSend': EtherPlan.Action.editSend,
-    'click #editCancel': EtherPlan.Action.editCancel,
-    'click #moveInline': EtherPlan.Action.inline,
-    'click #moveOutline': EtherPlan.Action.outline,
+    'click #iconActionCheck': EtherPlan.Action.editSend,
+    'click #iconActionX': EtherPlan.Action.editCancel,
+    'click #iconActionArrowLeft': EtherPlan.Action.inline,
+    'click #iconActionArrowRight': EtherPlan.Action.outline,
     'click #moveTo': EtherPlan.Action.moveTo,
-    'click #moveUp': EtherPlan.Action.up,
-    'click #moveDown': EtherPlan.Action.down,
-    'click #remove': EtherPlan.Action.remove,
-    'click #addChild': EtherPlan.Action.addChild,
-    'click #addBrother': EtherPlan.Action.addBrother,
+    'click #iconActionArrowUp': EtherPlan.Action.up,
+    'click #iconActionArrowDown': EtherPlan.Action.down,
+    'click #iconActionMinus': EtherPlan.Action.remove,
+    'click #iconActionPlusPlus': EtherPlan.Action.addChild,
+    'click #iconActionPlus': EtherPlan.Action.addBrother,
     'click #showOptions': EtherPlan.Action.showOptions,
     'click #hideOptions': EtherPlan.Action.hideOptions,
     'click #showDebug': EtherPlan.Action.showDebug,

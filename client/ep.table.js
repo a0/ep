@@ -1,3 +1,20 @@
+EtherPlan.Action.addLast = function (evt) {
+    var numParts = EtherPlan.Parts.find({doc: Session.get('doc')}).count();
+    var lastRow = EtherPlan.Parts.findOne({doc: Session.get('doc')}, {
+        sort: {
+            order: -1
+        }
+    });
+    if (numParts == 1) {
+        Session.set('adding_part', lastRow._id);
+    } else {
+        Session.set('adding_brother_part', lastRow._id);
+    }
+    Session.set('editing_part', null);
+    EtherPlan.Helper.flush_focus("entryLabel");
+}
+
+
 Template.table.hasParts = function () {
     return (EtherPlan.Parts.find({doc: Session.get('doc')}).count() > 0);
 };
@@ -40,3 +57,9 @@ Handlebars.registerHelper('spaceLabelEntry', function (part) {
     }
     return strSpaces;
 });
+
+Template.table.events = {
+    'click #iconActionPlusDefault': EtherPlan.Action.addLast
+};
+
+

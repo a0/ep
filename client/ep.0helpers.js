@@ -381,6 +381,12 @@ EtherPlan.Helper.set_part_value = function(partId,field,value) {
     //console.log("set value for " + partId + " {" + field + "," + value + "}")
 }
 
+EtherPlan.Helper.flush_focus = function(field) {
+    //Meteor.flush();
+    //EtherPlan.Helper.focus_field_by_id(field);
+}
+
+
 EtherPlan.Helper.delete_part = function(partId) {
     // TODO: make more secure
     EtherPlan.Parts.remove(partId);

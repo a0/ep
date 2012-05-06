@@ -23,7 +23,7 @@ EtherPlan.Action.entryNewSend = function (text, evt) {
 }
 
 Template.entryNew.events = {
-    'click #entryNewSend': EtherPlan.Action.entryNewSend
+    'click #iconActionCheck': EtherPlan.Action.entryNewSend
 };
 
 Template.entryNew.events[EtherPlan.Helper.okcancel_events('#entryLabel')] = EtherPlan.Helper.make_okcancel_handler({

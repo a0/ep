@@ -10,8 +10,7 @@ EtherPlan.Action.clickLabel = function (evt) {
     Session.set('adding_brother_part', null);
     Session.set('adding_part', null);
     Session.set('editing_part', this._id);
-    Meteor.flush();
-    EtherPlan.Helper.focus_field_by_id("editLabel");
+    EtherPlan.Helper.flush_focus("editLabel");
 };
 
 EtherPlan.Action.clickStart= function (evt) {
@@ -19,8 +18,7 @@ EtherPlan.Action.clickStart= function (evt) {
         Session.set('adding_brother_part', null);
         Session.set('adding_part', null);
         Session.set('editing_part', this._id);
-        Meteor.flush();
-        EtherPlan.Helper.focus_field_by_id("editStart");
+        EtherPlan.Helper.flush_focus("editStart");
     }
 };
 
@@ -29,8 +27,7 @@ EtherPlan.Action.clickValue = function (evt) {
         Session.set('adding_brother_part', null);
         Session.set('adding_part', null);
         Session.set('editing_part', this._id);
-        Meteor.flush();
-        EtherPlan.Helper.focus_field_by_id("editValue");
+        EtherPlan.Helper.flush_focus("editValue");
     }
 };
 
