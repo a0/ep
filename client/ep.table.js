@@ -37,6 +37,14 @@ Template.table.hasDoc = function () {
     return (doc != "");
 }
 
+Template.table.noDoc = function () {
+    return (!Template.table.hasDoc());
+}
+
+Template.table.noParts = function () {
+    return (!Template.table.hasParts());
+}
+
 Handlebars.registerHelper('spaceLabel', function (part) {
     var numSpaces = EtherPlan.LEVELSPACE * part.level;
     var strSpaces = "";

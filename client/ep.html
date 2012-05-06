@@ -5,62 +5,48 @@
 <body>{{> table}}</body>
 
 <template name="table">
+    {{#if noDoc}} 
+        <div id="inner">
+            <div id="newPlan" onclick="EtherPlan.Helper.go_random()">New Plan</div>
+            <br /><br />
+            or create/open a plan with the name
+            <form action="#" id="formCreate" onsubmit="EtherPlan.Helper.go_name();return false;"> 
+                <input type="text" id="planName"> 
+                <button type="submit" id="ok">OK</button>
+            </form>
+        </div>
+    {{else}} 
     <table id="parts" class="unselectable">
-        {{#if hasDoc}} 
-            <tr>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-            </tr>
-            {{#if hasParts}} 
-            {{else}} 
-                {{> entryNew}} 
-            {{/if}} 
-            {{#each parts}} 
-                {{> part}}
-            {{/each}}
-        {{else}} 
-            <tr>
-                <td colspan="3">
-                    <div id="inner">
-                        <div id="newPlan" onclick="EtherPlan.Helper.go_random()">New Plan</div>
-                        <br /><br />
-                        or create/open a plan with the name
-                        <form action="#" id="formCreate" onsubmit="EtherPlan.Helper.go_name();return false;"> 
-                            <input type="text" id="planName"> 
-                            <button type="submit" id="ok">OK</button>
-                        </form>
-                    </div>
-                </td>
-                </td>
-            </tr>
+        <tr>
+            <th id="headerOrder">#</th>
+            <th>PART</th>
+            <th id="headerStart">START</th>
+            <th id="headerValue">LENGTH</th>
+        </tr>
+        {{#if noParts}} 
+            {{> entryNew}} 
         {{/if}} 
+
+        {{#each parts}} 
+            {{> part}}
+        {{/each}}
     </table>
+    {{/if}} 
     <div id="banner" class="unselectable"><span id="banner-ether">Ether</span><span id="banner-gantt">Plan</span></div>
     {{#if hasDoc}} 
         {{#if hasParts}} 
-            <table id="headers" class="unselectable">
-            <tr>
-                <th id="headerOrder">#</th>
-                <th>PART</th>
-                <th id="headerStart">START</th>
-                <th id="headerValue">LENGTH</th>
-            </tr>
-            </table>
-            <span id="iconActionPlusDefault" class="icon">&nbsp;</span>
-            <span id="iconMinus" class="icon">&nbsp;</span>
-            <span id="iconArrowLeft" class="icon">&nbsp;</span>
-            <span id="iconArrowDown" class="icon">&nbsp;</span>
-            <span id="iconArrowUp" class="icon">&nbsp;</span>
-            <span id="iconArrowRight" class="icon">&nbsp;</span>
-            <span id="iconCheck" class="icon">&nbsp;</span>
-            <span id="iconX" class="icon">&nbsp;</span>
+            <span class="unselectable">
+                <span id="iconActionPlusDefault" class="icon">&nbsp;</span>
+                <span id="iconMinus" class="icon">&nbsp;</span>
+                <span id="iconArrowLeft" class="icon">&nbsp;</span>
+                <span id="iconArrowDown" class="icon">&nbsp;</span>
+                <span id="iconArrowUp" class="icon">&nbsp;</span>
+                <span id="iconArrowRight" class="icon">&nbsp;</span>
+                <span id="iconCheck" class="icon">&nbsp;</span>
+                <span id="iconX" class="icon">&nbsp;</span>
+            </span>
         {{/if}} 
     {{/if}} 
-    <span class="unselectable">
-    <a class="madewith_badge" href="http://madewith.meteor.com/ep" target="_blank">&nbsp;</a>
-    </span>
 </template>
 
 <template name="part">
@@ -84,7 +70,7 @@
 </template>
 
 <template name="edit">
-    <tr class="editRow">
+    <tr>
         <td class="order">&nbsp;</td>
         <td>{{ spaceLabel this }}<input type="text" size="15" id="editLabel" value="{{ label }}" />
             <span id="iconActionMinus" class="icon">&nbsp;</span>
@@ -104,7 +90,7 @@
         <td class="value"><input type="text" size="2" id="editValue" value="{{ value }}" onchange="EtherPlan.Helper.edit_update_finish()" /></td>
     </tr>
     {{#if showOptions}}
-    <tr class="editRow">
+    <tr>
         <td class="order">&nbsp;</td>
         <td colspan="3">{{ spaceLabel this }}
             {{#if showOptions}}<button id="hideOptions">less</button>{{else}}<button id="showOptions">more</button>{{/if}}
@@ -124,7 +110,7 @@
             <input type="hidden" id="editPredecessors" value="{{ predecessors }}" />
     {{/if}}
     {{#if showDebug}}
-    <tr class="editRow">
+    <tr>
         <td class="order">&nbsp;</td>
         <td colspan="5">
             <small>
@@ -142,7 +128,7 @@
 </template>
 
 <template name="entry">
-    <tr class="entryRow">
+    <tr>
         <td class="order">&nbsp;</td>
         <td>{{ spaceLabelEntry this }}<input type="text" size="15" id="entryLabel" value="Part {{ sizeTable }}" />
             <input type="hidden" id="entryFinish" value="{{finish}}" onchange="EtherPlan.Helper.entry_update_value()" />
@@ -157,7 +143,7 @@
 </template>
 
 <template name="entryNew">
-    <tr class="entryRow">
+    <tr>
         <td class="order">&nbsp;</td>
         <td colspan="3"><input type="text"  size="15" id="entryLabel" value="WHOLE" />
             <input type="hidden" id="entryValue" value="0" />
