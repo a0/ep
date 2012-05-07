@@ -2,7 +2,7 @@
     <meta charset="utf-8">
     <title>EtherPlan</title>
 </head>
-<body>{{> table}}</body>
+<body >{{> table}}</body>
 
 <template name="table">
     {{#if noDoc}} 
@@ -18,10 +18,10 @@
     {{else}} 
     <table id="parts" class="unselectable">
         <tr>
-            <th id="headerOrder">#</th>
+            <th id="headerOrder">ID</th>
             <th>PART</th>
             <th id="headerStart">START</th>
-            <th id="headerValue">LENGTH</th>
+            <th id="headerValue">Δ</th>
         </tr>
         {{#if noParts}} 
             {{> entryNew}} 
@@ -33,6 +33,7 @@
     </table>
     {{/if}} 
     <div id="banner" class="unselectable"><span id="banner-ether">Ether</span><span id="banner-gantt">Plan</span></div>
+    <div id="buttonBar" >&nbsp;</div>
     {{#if hasDoc}} 
         {{#if hasParts}} 
             <span class="unselectable">
