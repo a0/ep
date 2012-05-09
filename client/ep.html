@@ -1,7 +1,10 @@
 <head>
     <meta charset="utf-8">
     <title>EtherPlan</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/base/jquery-ui.css" type="text/css" media="all" /> 
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
+
     <script type="text/javascript" src="app.js"></script>
 </head>
 <body >{{> table}}</body>
@@ -79,7 +82,7 @@
 <template name="edit">
     <tr{{#if isGroup}} class="isGroup" {{/if}}>
         <td class="order">{{ order }}</td>
-        <td>{{ spaceLabel this }}<input type="text" size="15" id="editLabel" value="{{ label }}" />
+        <td>{{ spaceLabel this }}<input type="text" size="25" id="editLabel" value="{{ label }}" />
             <span id="iconActionMinus" class="icon">&nbsp;</span>
             {{#if hasParent}}
                 <span id="iconActionPlus" class="icon">&nbsp;</span>
@@ -93,7 +96,9 @@
             <span id="iconActionCheck" class="icon">&nbsp;</span>
             <span id="iconActionX" class="icon">&nbsp;</span>{{#if showOptions}}<button id="hideOptions">less</button>{{else}}<button id="showOptions">more</button>{{/if}}
         </td>
-        <td class="start"><input type="text" size="7" id="editStart" value="{{ start }}" onchange="EtherPlan.Helper.edit_update_finish()" /></td>
+        <td class="start">
+            <input type="text" size="9" id="editStart" value="{{ start }}" onchange="EtherPlan.Helper.edit_update_finish()" onclick="$('#editStart').datepicker({dateFormat: 'yy-mm-dd'}); $('#editStart').datepicker('show');" />
+        </td>
         <td class="value"><input type="text" size="2" id="editValue" value="{{ value }}" onchange="EtherPlan.Helper.edit_update_finish()" /></td>
     </tr>
     {{#if showOptions}}
@@ -101,7 +106,7 @@
         <td class="order">&nbsp;</td>
         <td colspan="3">{{ spaceLabel this }}
             
-            <span id="finish">Finish:<input type="text" size="10" id="editFinish" value="{{ finish }}" onchange="EtherPlan.Helper.edit_update_value()" /></span>
+            <span id="finish">Finish:<input type="text" size="10" id="editFinish" value="{{ finish }}" onchange="EtherPlan.Helper.edit_update_value()" onclick="$('#editFinish').datepicker({dateFormat: 'yy-mm-dd'}); $('#editFinish').datepicker('show');" /></span>
             {{#if couldPredecessors}}
             Predecessors: 
             <input type="text" size="20" id="editPredecessors" value="{{ predecessors }}" />
@@ -141,14 +146,14 @@
 <template name="entry">
     <tr>
         <td class="order">&nbsp;</td>
-        <td>{{ spaceLabelEntry this }}<input type="text" size="15" id="entryLabel" value="Part {{ sizeTable }}" />
+        <td>{{ spaceLabelEntry this }}<input type="text" size="25" id="entryLabel" value="Part {{ sizeTable }}" />
             <input type="hidden" id="entryFinish" value="{{finish}}" onchange="EtherPlan.Helper.entry_update_value()" />
             <input type="hidden" id="entryParent" value="{{ _id }}" />
             <input type="hidden" size="2" id="entryPredecessors" value="{{ predecessors }}" />
             <span id="iconActionCheckEntry" class="icon">&nbsp;</span>
             <span id="iconActionXEntry" class="icon">&nbsp;</span>
         </td>
-        <td class="start"><input type="text" size="7" id="entryStart" value="{{start}}" onchange="EtherPlan.Helper.entry_update_finish()" /></td>
+        <td class="start"><input type="text" size="9" id="entryStart" value="{{start}}" onchange="EtherPlan.Helper.entry_update_finish()"onclick="$('#entryStart').datepicker({dateFormat: 'yy-mm-dd'}); $('#entryStart').datepicker('show');" /></td>
         <td class="value"><input type="text" size="2" id="entryValue" value="1" onchange="EtherPlan.Helper.entry_update_finish()" /></td>
     </tr>
 </template>
@@ -156,7 +161,7 @@
 <template name="entryNew">
     <tr>
         <td class="order">&nbsp;</td>
-        <td colspan="3"><input type="text"  size="15" id="entryLabel" value="WHOLE" />
+        <td colspan="3"><input type="text"  size="25" id="entryLabel" value="WHOLE" />
             <input type="hidden" id="entryValue" value="0" />
             <input type="hidden" id="entryParent" value="" />
             <input type="hidden" id="entryStart" value="{{start}}" />
