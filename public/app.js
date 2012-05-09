@@ -12,12 +12,11 @@ $(function () {
                 update:function(e, ui){
                     var oldOrder = parseInt(ui.item.find(".order").text());
                     var newOrder = parseInt(ui.item.prev().find(".order").text());
+                    if (oldOrder>newOrder) {
+                        newOrder++;
+                    }
                     if (EtherPlan.Helper.validate_move_part(oldOrder,newOrder)) {
-                        if (oldOrder<newOrder) {
                             EtherPlan.Helper.move_part(oldOrder,newOrder);
-                        } else {
-                            EtherPlan.Helper.move_part(oldOrder,newOrder+1);                        
-                        }
                     } else {
                         var element = $(ui.item[0]);
                         var lastPrev = element.data('lastPrev');
