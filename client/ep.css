@@ -25,7 +25,9 @@ border-collapse:collapse;
 font-family:'Ubuntu Mono', cursive;
 font-size:16px;
 }
-
+div.ui-datepicker{
+ font-size:12px;
+}
 table#parts tr td {
 border:0px solid #000;
 border-collapse:collapse;
