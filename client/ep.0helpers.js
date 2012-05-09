@@ -11,7 +11,7 @@ EtherPlan.Helper = {};
 EtherPlan.Action = {};
 
 EtherPlan.ENTER_KEY = 13;
-EtherPlan.LEVELSPACE = 4;
+EtherPlan.LEVELSPACE = 2;
 
 Session.set('editing_part', null);
 Session.set('adding_part', null);
@@ -267,16 +267,15 @@ EtherPlan.Helper.inline_part = function(objPart) {
     EtherPlan.Helper.update_values();
 }
 
-EtherPlan.Helper.move_part = function(oldOrder,newOrder) {
-    
+EtherPlan.Helper.validate_move_part = function(oldOrder,newOrder) {
     if (newOrder <= 0) {
         console.log("not moved, new order must be > 0");
-        return;        
+        return false;        
     } 
     
     if (newOrder >= EtherPlan.Helper.size_doc()) {
         console.log("not moved, new order must be < document size");
-        return;        
+        return false;        
     }
 
     var part = EtherPlan.Parts.findOne({order: oldOrder});
@@ -284,8 +283,14 @@ EtherPlan.Helper.move_part = function(oldOrder,newOrder) {
     
     if (newOrder <= oldOrder+size && newOrder >= oldOrder) {
         console.log("not moved to same location")
-        return;
+        return false;
     }
+    return true;
+}
+
+EtherPlan.Helper.move_part = function(oldOrder,newOrder) {
+    var part = EtherPlan.Parts.findOne({order: oldOrder});
+    var size = EtherPlan.Helper.size_tree(part._id);
     
     var oldParent = part.parent;
     var oldLevel = part.level;    

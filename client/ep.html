@@ -1,6 +1,8 @@
 <head>
     <meta charset="utf-8">
     <title>EtherPlan</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="app.js"></script>
 </head>
 <body >{{> table}}</body>
 
@@ -17,23 +19,27 @@
         </div>
     {{else}} 
     <table id="parts" class="unselectable">
-        <tr>
-            <th id="headerOrder">ID</th>
-            <th>PART</th>
-            <th id="headerStart">START</th>
-            <th id="headerValue">Δ</th>
-        </tr>
-        {{#if noParts}} 
-            {{> entryNew}} 
-        {{/if}} 
+        <thead>
+            <tr>
+                <th id="headerOrder">ID</th>
+                <th>PART</th>
+                <th id="headerStart">START</th>
+                <th id="headerValue">Δ</th>
+            </tr>
+        </thead>
+        <tbody class="sortable">
+            {{#if noParts}} 
+                {{> entryNew}} 
+            {{/if}} 
 
-        {{#each parts}} 
-            {{> part}}
-        {{/each}}
+            {{#each parts}} 
+                {{> part}}
+            {{/each}}
+        </tbody>
     </table>
+    <div id="buttonBar" >&nbsp;</div>
     {{/if}} 
     <div id="banner" class="unselectable"><span id="banner-ether">Ether</span><span id="banner-gantt">Plan</span></div>
-    <div id="buttonBar" >&nbsp;</div>
     {{#if hasDoc}} 
         {{#if hasParts}} 
             <span class="unselectable">
@@ -62,7 +68,7 @@
 </template>
 
 <template name="show">
-    <tr{{#if isGroup}} class="isGroup" {{/if}}>
+    <tr class="{{#if isGroup}} isGroup{{/if}}">
         <td class="order showOrder">{{ order }}</td>
         <td class="showLabel">{{ spaceLabel this }}{{ label }}</td>
         <td class="start showStart">{{ start }}</td>
@@ -71,8 +77,8 @@
 </template>
 
 <template name="edit">
-    <tr>
-        <td class="order">&nbsp;</td>
+    <tr{{#if isGroup}} class="isGroup" {{/if}}>
+        <td class="order">{{ order }}</td>
         <td>{{ spaceLabel this }}<input type="text" size="15" id="editLabel" value="{{ label }}" />
             <span id="iconActionMinus" class="icon">&nbsp;</span>
             {{#if hasParent}}
@@ -85,7 +91,7 @@
             {{#if couldDown}}<span id="iconActionArrowDown" class="icon">&nbsp;</span>{{/if}}
             {{#if couldOutline}}<span id="iconActionArrowRight" class="icon">&nbsp;</span>{{/if}}
             <span id="iconActionCheck" class="icon">&nbsp;</span>
-            <span id="iconActionX" class="icon">&nbsp;</span>
+            <span id="iconActionX" class="icon">&nbsp;</span>{{#if showOptions}}<button id="hideOptions">less</button>{{else}}<button id="showOptions">more</button>{{/if}}
         </td>
         <td class="start"><input type="text" size="7" id="editStart" value="{{ start }}" onchange="EtherPlan.Helper.edit_update_finish()" /></td>
         <td class="value"><input type="text" size="2" id="editValue" value="{{ value }}" onchange="EtherPlan.Helper.edit_update_finish()" /></td>
@@ -94,7 +100,7 @@
     <tr>
         <td class="order">&nbsp;</td>
         <td colspan="3">{{ spaceLabel this }}
-            {{#if showOptions}}<button id="hideOptions">less</button>{{else}}<button id="showOptions">more</button>{{/if}}
+            
             <span id="finish">Finish:<input type="text" size="10" id="editFinish" value="{{ finish }}" onchange="EtherPlan.Helper.edit_update_value()" /></span>
             {{#if couldPredecessors}}
             Predecessors: 
@@ -118,7 +124,11 @@
             <ol>
                 <li>id: {{_id}}</li>
                 <li>level: {{level}}</li>
+                <li>order: {{order}}</li>
                 <li>parent: {{parent}}</li>
+                <li>predecessors: {{predecessors}}</li>
+                <li>start: {{start}}</li>
+                <li>finish: {{finish}}</li>
                 <li>timestampCreated: {{timestampCreated}}</li> 
                 <li>timestampUpdated: {{timestampUpdated}}</li> 
             </ol>

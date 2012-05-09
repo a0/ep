@@ -33,7 +33,6 @@ EtherPlan.Action.clickValue = function (evt) {
 
 Template.part.events = {
     'click .showLabel': EtherPlan.Action.clickLabel,
-    'click .showOrder': EtherPlan.Action.clickLabel,
     'click .showStart': EtherPlan.Action.clickStart,
     'click .showValue': EtherPlan.Action.clickValue
 };
