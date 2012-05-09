@@ -15,6 +15,10 @@ color:#888;
 display:none;
 }
 
+td.order {
+	padding-left:8px !important; 
+}
+
 table#parts {
 position:absolute;
 overflow:auto;
@@ -32,7 +36,8 @@ table#parts tr td {
 border:0px solid #000;
 border-collapse:collapse;
 height:30px;
-padding:3px;
+padding:0px;
+padding-left:3px;
 }
 
 table#parts tr th {
@@ -263,4 +268,7 @@ width:25px;
 }
 .order {
 cursor: move;
+background:url(/side.png) no-repeat 0 center;
+
 }
+
