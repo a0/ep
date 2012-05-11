@@ -485,3 +485,11 @@ EtherPlan.Helper.entry_update_value = function() {
 
     EtherPlan.Helper.update_value(value,start,finish);
 }
+
+// from: http://stackoverflow.com/questions/2808184/restricting-input-to-textbox-allowing-only-numbers-and-decimal-point
+EtherPlan.Helper.is_number_key = function(evt) {
+    var charCode = (evt.which) ? evt.which : event.keyCode
+    if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57))
+        return false;
+    return true;
+}
