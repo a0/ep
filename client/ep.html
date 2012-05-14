@@ -1,7 +1,7 @@
 <head>
     <meta charset="utf-8">
     <title>EtherPlan</title>
-    <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
 <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/base/jquery-ui.css" type="text/css" media="all" /> 
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
 
@@ -97,7 +97,7 @@
             <span id="iconActionX" class="icon" title="CANCEL CHANGES">&nbsp;</span>{{#if showOptions}}<button id="hideOptions"> less options </button>{{else}}<button id="showOptions"> more options </button><input type="hidden" id="editFinish" value="{{ finish }}" />{{/if}}
         </td>
         <td class="start">
-            <input type="text" size="9" id="editStart" value="{{ start }}" onchange="EtherPlan.Helper.edit_update_finish()" onclick="$('#editStart').datepicker({dateFormat: 'yy-mm-dd'}); $('#editStart').datepicker('show');" />
+            <input type="text" size="10" id="editStart" value="{{ start }}" onchange="EtherPlan.Helper.edit_update_finish()" onclick="$('#editStart').datepicker({dateFormat: 'yy-mm-dd'}); $('#editStart').datepicker('show');" />
         </td>
         <td class="value"><input type="text" size="2" id="editValue" value="{{ value }}" onchange="EtherPlan.Helper.edit_update_finish()" onkeypress="return EtherPlan.Helper.is_number_key(event)" /></td>
     </tr>

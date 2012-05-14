@@ -11,7 +11,7 @@ EtherPlan.Helper = {};
 EtherPlan.Action = {};
 
 EtherPlan.ENTER_KEY = 13;
-EtherPlan.LEVELSPACE = 2;
+EtherPlan.LEVELSPACE = 4;
 
 Session.set('editing_part', null);
 Session.set('adding_part', null);
@@ -39,7 +39,7 @@ EtherPlan.Helper.make_okcancel_handler = function (options) {
             cancel.call(this, evt);
 
         } else if (evt.type === "keyup" && evt.which === 13) {
-            // breturn/enter = ok/submit if non-empty
+            // return/enter = ok/submit if non-empty
             var value = String(evt.target.value || "");
             if (value) ok.call(this, value, evt);
             else cancel.call(this, evt);
@@ -387,7 +387,7 @@ EtherPlan.Helper.set_part_value = function(partId,field,value) {
 }
 
 EtherPlan.Helper.flush_focus = function(field) {
-    //Meteor.flush();
+    Meteor.flush();
     //EtherPlan.Helper.focus_field_by_id(field);
 }
 

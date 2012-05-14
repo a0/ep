@@ -3,17 +3,6 @@ margin:0;
 padding:0;
 }
 
-.isGroup {
-background-color:#eee;
-}
-
-.isGroup .value,.isGroup .start {
-color:#888;
-}
-
-.isGroup input#editValue,.isGroup input#editStart,.isGroup span#finish,.hide {
-display:none;
-}
 
 td.order {
 	padding-left:8px !important; 
@@ -23,32 +12,40 @@ table#parts {
 position:absolute;
 overflow:auto;
 top:64px;
-border:0;
+border:0px;
 width:100%;
+font-weight: normal;
+font-family: 'Droid Sans', sans-serif;
+color: #222;
 border-collapse:collapse;
-font-family:'Ubuntu Mono', cursive;
-font-size:16px;
+font-size:12px;
 }
+
 div.ui-datepicker{
  font-size:12px;
 }
+
 table#parts tr td {
-border:0px solid #000;
-border-collapse:collapse;
-height:30px;
-padding:0px;
-padding-left:0px;
 }
 
 table#parts tr th {
-border:1px solid #000;
-background-color:#000;
-border-collapse:collapse;
-height:25px;
 text-align:left;
-font-weight:400;
-color:#fff;
-padding:3px;
+background:#fff;
+font-size:14px;
+}
+
+table#parts tr td,table#parts tr th {
+border:0px;
+height:30px;
+padding:0px;
+}
+
+table#parts tr th#headerOrder {
+	padding-left:8px;
+}
+
+table tr:nth-child(2n+1) {
+  background-color: #eee;
 }
 
 #buttonBar {
@@ -93,17 +90,23 @@ padding-left:3px;
 color:#E8F4FF;
 }
 
-input {
-	border: none !important;
-	border-radius:3px;
-	height:22px;
-	font-size:16px;
-	font-family:'Ubuntu Mono', cursive;
-	background-color: #ddd;
+table#parts input {
+	border: 1px #222 solid !important;
+	border-radius: 4px;
+
+	height:20px;
+
 	position: relative; 
-	left: -1px;
+	left: -2px;
+
+	background-color: transparent;
+	color: #222;
+
+	font-family: 'Droid Sans', sans-serif;
+	font-weight: normal;
+	font-size:12px;
 }
-input:focus { 
+table#parts input:focus { 
 	outline:0px;
 }
 
@@ -247,16 +250,16 @@ z-index:20000;
 
 .start {
 text-align:left;
-width:90px;
+width:100px;
 }
 
 #headerStart {
-width:90px;
+width:100px;
 }
 
 .value {
 text-align:left;
-width:25px;
+width:30px;
 }
 
 #iconActionCheck,#iconActionCheckEntry {
@@ -271,12 +274,40 @@ left:229px;
 z-index:20000;
 }
 
+
+#showOptions, #hideOptions {
+ left:300px;
+ z-index:20000;
+ position:fixed;
+top:38px;
+} 
+#showDebug, #hideDebug {
+ left:400px;
+ z-index:20000;
+ position:fixed;
+top:38px;
+} 
+
 .order,#headerOrder,#headerValue {
 width:25px;
 }
-.order {
+
+
+.order:hover {
 cursor: move;
 background:url(/side.png) no-repeat 0 center;
+}
 
+
+.isGroup td.showLabel, table#parts tr.isGroup input {
+	color:#009;
+}
+
+.isGroup .value,.isGroup .start {
+	color:#888;
+}
+
+.isGroup input#editValue,.isGroup input#editStart,.isGroup span#finish,.hide {
+	display:none;
 }
 
