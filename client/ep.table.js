@@ -11,9 +11,12 @@ EtherPlan.Action.addLast = function (evt) {
         Session.set('adding_brother_part', lastRow._id);
     }
     Session.set('editing_part', null);
-    EtherPlan.Helper.flush_focus("entryLabel");
 }
 
+
+Template.table.docId = function () {
+    return Session.get('doc');
+};
 
 Template.table.hasParts = function () {
     return (EtherPlan.Parts.find({doc: Session.get('doc')}).count() > 0);

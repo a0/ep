@@ -15,7 +15,7 @@ EtherPlan.Action.entryNewSend = function (text, evt) {
         doc: Session.get('doc'),
         timestampCreated: (new Date()).getTime(),
         start: start.value,
-        finish: finish.value,
+        finish: finish.value
     });
     if (evt) {
         evt.target.value = '';

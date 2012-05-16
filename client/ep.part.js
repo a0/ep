@@ -10,7 +10,7 @@ EtherPlan.Action.clickLabel = function (evt) {
     Session.set('adding_brother_part', null);
     Session.set('adding_part', null);
     Session.set('editing_part', this._id);
-    EtherPlan.Helper.flush_focus("editLabel");
+    Session.set('field_edit','editLabel');
 };
 
 EtherPlan.Action.clickStart= function (evt) {
@@ -18,7 +18,16 @@ EtherPlan.Action.clickStart= function (evt) {
         Session.set('adding_brother_part', null);
         Session.set('adding_part', null);
         Session.set('editing_part', this._id);
-        EtherPlan.Helper.flush_focus("editStart");
+        Session.set('field_edit','editStart');
+    }
+};
+
+EtherPlan.Action.clickFinish= function (evt) {
+    if (!this.isGroup) {
+        Session.set('adding_brother_part', null);
+        Session.set('adding_part', null);
+        Session.set('editing_part', this._id);
+        Session.set('field_edit','editFinish');
     }
 };
 
@@ -27,13 +36,14 @@ EtherPlan.Action.clickValue = function (evt) {
         Session.set('adding_brother_part', null);
         Session.set('adding_part', null);
         Session.set('editing_part', this._id);
-        EtherPlan.Helper.flush_focus("editValue");
+        Session.set('field_edit','editValue');
     }
 };
 
 Template.part.events = {
     'click .showLabel': EtherPlan.Action.clickLabel,
     'click .showStart': EtherPlan.Action.clickStart,
+    'click .showFinish': EtherPlan.Action.clickFinish,
     'click .showValue': EtherPlan.Action.clickValue
 };
 

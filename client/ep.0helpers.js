@@ -47,15 +47,6 @@ EtherPlan.Helper.make_okcancel_handler = function (options) {
     };
 };
 
-// from meteor samples
-EtherPlan.Helper.focus_field_by_id = function (id) {
-    var input = document.getElementById(id);
-    if (input) {
-        input.focus();
-        input.select(false);
-    }
-};
-
 // from http://befused.com/javascript/get-filename-url
 EtherPlan.Helper.get_doc = function () {
     var url = window.location.pathname;
@@ -386,12 +377,6 @@ EtherPlan.Helper.set_part_value = function(partId,field,value) {
     //console.log("set value for " + partId + " {" + field + "," + value + "}")
 }
 
-EtherPlan.Helper.flush_focus = function(field) {
-    Meteor.flush();
-    //EtherPlan.Helper.focus_field_by_id(field);
-}
-
-
 EtherPlan.Helper.delete_part = function(partId) {
     // TODO: make more secure
     EtherPlan.Parts.remove(partId);
@@ -451,7 +436,7 @@ EtherPlan.Helper.update_value = function(value,start,finish) {
     var sDate = Date.parseFormat(start.value,"YYYY-MM-DD");
     var fDate = Date.parseFormat(finish.value,"YYYY-MM-DD");
 
-    value.value = sDate.diff(fDate, 'businessdays');
+    value.value = sDate.diff(fDate, 'businessdays')+1;
 }
 
 EtherPlan.Helper.edit_update_finish = function() {

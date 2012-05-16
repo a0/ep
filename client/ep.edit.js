@@ -48,13 +48,11 @@ EtherPlan.Action.remove = function () {
 EtherPlan.Action.addChild = function (evt) {
     Session.set('editing_part', null);
     Session.set('adding_part', this._id);
-    EtherPlan.Helper.flush_focus("entryLabel");
 }
 
 EtherPlan.Action.addBrother = function (evt) {
     Session.set('editing_part', null);
     Session.set('adding_brother_part', this._id);
-    EtherPlan.Helper.flush_focus("entryLabel");
 }
 
 EtherPlan.Action.up = function () {
@@ -67,7 +65,11 @@ EtherPlan.Action.down = function () {
 
 EtherPlan.Action.moveTo = function () {
     var newOrder = parseInt(document.getElementById('newOrder').value);
-    EtherPlan.Helper.move_part(this.order,newOrder);
+    var oldOrder = parseInt(this.order);
+
+    if (!isNaN(newOrder) && EtherPlan.Helper.validate_move_part(oldOrder,newOrder)) {
+        EtherPlan.Helper.move_part(oldOrder,newOrder);
+    }
     Session.set('editing_part', null);
 }
 
@@ -101,7 +103,7 @@ Template.edit.events = {
     'click #showOptions': EtherPlan.Action.showOptions,
     'click #hideOptions': EtherPlan.Action.hideOptions,
     'click #showDebug': EtherPlan.Action.showDebug,
-    'click #hideDebug': EtherPlan.Action.hideDebug,
+    'click #hideDebug': EtherPlan.Action.hideDebug
 };
 
 Template.edit.events[EtherPlan.Helper.okcancel_events('')] = EtherPlan.Helper.make_okcancel_handler({
@@ -173,3 +175,4 @@ Template.edit.showDebug = function () {
 Template.edit.showOptions = function () {
     return Session.get("show_options");
 };
+

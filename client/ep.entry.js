@@ -41,7 +41,7 @@ EtherPlan.Action.entry = function (text, evt) {
         doc: Session.get('doc'),
         timestampCreated: (new Date()).getTime(),
         start: start.value,
-        finish: finish.value,
+        finish: finish.value
     };
 
     if (predecessors.value != "") {
