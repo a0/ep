@@ -10,7 +10,6 @@ EtherPlan.Action.editSend = function (text, evt) {
     }
     if (this.value != parseInt(value.value)) {
         EtherPlan.Helper.set_part_value(this._id,"value",parseInt(value.value));
-        EtherPlan.Helper.update_values();
     }
     if (this.start != start.value) {
         EtherPlan.Helper.set_part_value(this._id,"start",start.value);
@@ -21,6 +20,8 @@ EtherPlan.Action.editSend = function (text, evt) {
     if (this.predecessors != predecessors.value) {
         EtherPlan.Helper.set_part_value(this._id,"predecessors",predecessors.value);
     }
+
+    EtherPlan.Helper.update_values();
 
     Session.set('editing_part', null);
     if (evt) {

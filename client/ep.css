@@ -295,7 +295,7 @@ table#parts input:focus
 	top: 37px;
 	z-index: 2;
 }
-#showOptions, #hideOptions, #showDebug, #hideDebug, #moveTo
+#showOptions, #hideOptions, #showDebug, #hideDebug, #moveTo, .clearInput
 {
 	font-family: 'Droid Sans', sans-serif;
 	font-size: 12px;

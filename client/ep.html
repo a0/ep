@@ -117,7 +117,7 @@
         <td colspan="4">{{ spaceLabel this }}
             {{#if couldPredecessors}}
             Predecessors: 
-            <input type="text" size="35" id="editPredecessors" value="{{ predecessors }}" />
+            <input type="text" size="40" id="editPredecessors" value="{{ predecessors }}" /><button class="clearInput" onclick="EtherPlan.Helper.clear_input('editPredecessors')">x</button>
             {{else}}
             <input type="hidden" id="editPredecessors" value="{{ predecessors }}" />
             {{/if}}
@@ -157,7 +157,7 @@
         <td class="order">&nbsp;</td>
         <td>{{ spaceLabelEntry this }}<input type="text" size="25" id="entryLabel" value="Part {{ sizeTable }}" />
             <input type="hidden" id="entryParent" value="{{ _id }}" />
-            <input type="hidden" size="2" id="entryPredecessors" value="{{ predecessors }}" />
+            <input type="hidden" size="2" id="entryPredecessors" value="" />
             <span id="iconActionCheckEntry" class="icon">&nbsp;</span>
             <span id="iconActionXEntry" class="icon">&nbsp;</span>
         </td>

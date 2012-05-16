@@ -77,44 +77,6 @@ EtherPlan.Helper.find_last_leaf = function (objParent) {
     }
 }
 
-EtherPlan.Helper.update_values = function () {
-    var h = {};
-    var old = {};
-
-    // save old values and reset
-    EtherPlan.Parts.find({doc: Session.get('doc')}).forEach(function (part) {
-        if (part.isGroup) {
-            old[part._id] = part.value;
-            h[part._id] = 0;
-        }
-    });
-
-    // add all leaf
-    EtherPlan.Parts.find({doc: Session.get('doc')}).forEach(function (part) {
-        if (!part.isGroup && part.parent) {
-            h[part.parent] += part.value;
-        }
-    });
-
-    // reverse add all branches
-    EtherPlan.Parts.find({doc: Session.get('doc')}, {
-        sort: {
-            order: -1
-        }
-    }).forEach(function (part) {
-        if (part.isGroup && part.parent) {
-            h[part.parent] += h[part._id];
-        }
-    });
-
-    // update only changed values
-    for (var k in h) {
-        if (h[k] != old[k]) {
-            EtherPlan.Helper.set_part_value(k,"value",h[k]);
-        }
-    }
-}
-
 EtherPlan.Helper.update_orders = function () {
     var h = {};
     var old = {};
@@ -477,4 +439,132 @@ EtherPlan.Helper.is_number_key = function(evt) {
     if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57))
         return false;
     return true;
+}
+
+// from: http://stackoverflow.com/questions/613114/little-x-in-textfield-input-on-the-iphone-in-mobilesafari
+EtherPlan.Helper.clear_input = function(id) {
+    $("#" + id).get(0).value="";
+    return false;
+}
+
+// from: http://code.google.com/p/tesis-e/source/browse/trunk/vocab-editor/static/js/snippets.js
+EtherPlan.Helper.topological_sort = function(edges, nodes) {
+    var L = [];
+    var S = [];
+
+    var hasIncomming = function(edges, node) {
+        for (var j = 0; j < edges.length; j++) {
+            if (edges[j].to == node) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    var removeFromTo = function(edges, from, to) {
+        for (var j = 0; j < edges.length; j++) {
+            var e = edges[j];
+            if (e.from == from && e.to == to) {
+                edges.splice(j, 1);;
+            }
+        }
+    }
+
+    for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+        if (!hasIncomming(edges, node)) {
+            S.push(node);
+        }
+    }
+
+    while (S.length) {
+        var n = S.pop();
+        L.push(n);
+        var edgesFromN = [];
+        for (var j = 0; j < edges.length; j++) {
+            var e = edges[j];
+            if (e.from == n) {
+                edgesFromN.push(e);
+            }
+        }
+        while (edgesFromN.length) {
+            var m = edgesFromN.pop().to;
+            removeFromTo(edges, n, m);
+            if (!hasIncomming(edges, m)) {
+                S.push(m);
+            }
+        }
+    }
+    //console.log(edges);
+    return L;
+}
+// end from: http://code.google.com/p/tesis-e/source/browse/trunk/vocab-editor/static/js/snippets.js 
+
+EtherPlan.Helper.update_values = function () {
+    var edges = [];
+    var nodes = [];
+
+    var labels = [];
+    var groups = [];
+
+    // save old values and reset
+    EtherPlan.Parts.find({doc: Session.get('doc')}).forEach(function (part) {
+        if (part.isGroup) {
+            groups[part._id] = {start: "",finish:""};
+        }
+        labels[part._id] = part.label;
+        nodes.push(part._id);
+        if (part.parent) {
+            edges.push({from: part._id, to: part.parent});
+        } 
+        if (part.predecessors) {
+            edges.push({from: part._id, to: part.predecessors});
+        }
+    });
+
+    // sort using topological sorting
+    var list = EtherPlan.Helper.topological_sort(edges,nodes);
+    
+    // change start and finish
+    for (var n=0;n<list.length;n++) {
+        //console.log(labels[list[n]]);
+
+        var part = EtherPlan.Helper.get_part(list[n]);
+        var parent = part.parent;
+
+        if (parent) {
+            var gParent = groups[parent];
+            var tPart = part;
+            if (part.isGroup) {
+                tPart = groups[list[n]];
+            }
+
+            var dateStartPart = Date.parseFormat(tPart.start,"YYYY-MM-DD");
+            var dateStartParent = Date.parseFormat(gParent.start,"YYYY-MM-DD");;
+
+            var dateFinishPart = Date.parseFormat(tPart.finish,"YYYY-MM-DD");;
+            var dateFinishParent = Date.parseFormat(gParent.finish,"YYYY-MM-DD");;
+
+            if (!dateStartParent || dateStartPart < dateStartParent) {
+                //console.log("DATES START: " + labels[parent] + "->" + tPart.start + " " + gParent.start);
+                gParent.start = tPart.start;
+            }
+
+            if (!dateFinishParent || dateFinishPart > dateFinishParent) {
+                //console.log("DATES FINISH: " + labels[parent] + "->"  + tPart.finish + " " + gParent.finish);
+                gParent.finish = tPart.finish;
+            }
+        }
+    }
+
+    for (var k in groups) {
+        var g = groups[k];
+        var sDate = Date.parseFormat(g.start,"YYYY-MM-DD");
+        var fDate = Date.parseFormat(g.finish,"YYYY-MM-DD");
+        var newValue = sDate.diff(fDate, 'businessdays')+1;
+
+        EtherPlan.Helper.set_part_value(k,"start",g.start);
+        EtherPlan.Helper.set_part_value(k,"finish",g.finish);
+        EtherPlan.Helper.set_part_value(k,"value",newValue);
+    }
 }
