@@ -11,7 +11,6 @@ $(function () {
     var initSortable = function () {
             $("tbody.sortable").sortable({
                 items: "tr:not(:first)",
-                //helper: 'clone',
                 helper: fixHelper,
                 update:function(e, ui){
                     var oldOrder = parseInt(ui.item.find(".order").text());

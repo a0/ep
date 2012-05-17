@@ -6,15 +6,15 @@
 }
 td.order
 {
-	padding-left: 8px !important;
+	padding-left: 18px !important;
 }
 table#parts
 {
 	border: 0px;
 	border-collapse: collapse;
-	color: #222;
+	color: #000;
 	font-family: 'Droid Sans', sans-serif;
-	font-size: 12px;
+	font-size: 14px;
 	font-weight: normal;
 	overflow: auto;
 	position: absolute;
@@ -31,7 +31,7 @@ table#parts tr td
 table#parts tr th
 {
 	background: #fff;
-	font-size: 14px;
+	font-size: 16px;
 	text-align: left;
 }
 table#parts tr td,table#parts tr th
@@ -39,11 +39,33 @@ table#parts tr td,table#parts tr th
 	border: 0px;
 	height: 30px;
 	padding: 0px;
+	padding-left: 5px;
 }
+table#parts tr
+{
+	/* from: http://coding.smashingmagazine.com/2008/08/13/top-10-css-table-designs/ */
+	background: url(/gradback.png) repeat-x;
+}
+table#parts tr:hover
+{
+	background: #ddd;
+}
+table#parts tr th
+{
+	background: #aaa;;
+}
+
+
+
 table#parts tr th#headerOrder
 {
-	padding-left: 8px;
+	padding-left: 18px;
 }
+.order, table#parts tr th#headerOrder
+{
+	width: 40px;
+}
+
 #buttonBar
 {
 	background: #ccc;
@@ -95,12 +117,12 @@ table#parts input
 	background-color: #eee;
 	border: 1px #aaa solid !important;
 	border-radius: 4px;
-	color: #222;
+	color: #000;
 	font-family: 'Droid Sans', sans-serif;
-	font-size: 12px;
+	font-size: 14px;
 	font-weight: normal;
 	height: 20px;
-	left: -2px;
+	left: -1px;
 	position: relative;
 }
 table#parts input:focus
@@ -267,7 +289,7 @@ table#parts input:focus
 .value
 {
 	text-align: left;
-	width: 50px;
+	width: 40px;
 }
 #iconActionCheck,#iconActionCheckEntry
 {
@@ -303,9 +325,9 @@ table#parts input:focus
 	height: 24px;
 	padding: 0px 5px 0px 5px;
 }
-.order,#headerOrder,#headerValue
+#headerValue
 {
-	width: 25px;
+	width: 40px;
 }
 .order:hover
 {
@@ -324,9 +346,9 @@ table#parts input:focus
 {
 	display: none;
 }
-.edit
+tr.edit td, tr.edit:hover td
 {
-	background-color: transparent;
+	background-color: #fff !important;
 }
 
 #buttonBar, #banner, .icon, .showOrder, .showLabel, .showStart, .showFinish, .showValue, #parts th {
@@ -340,4 +362,10 @@ table#parts input:focus
    */
    -ms-user-select: none;
    user-select: none;
+}
+
+
+.showLabel, .showStart, .showFinish, #headerFinish, #headerLabel, #headerStart {
+	border-right: 1px dashed #888 !important;
+	border-left: 1px dashed #888 !important;
 }
