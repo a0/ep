@@ -116,12 +116,11 @@
         <td class="order">&nbsp;</td>
         <td colspan="4">{{ spaceLabel this }}
             {{#if couldPredecessors}}
-            Predecessors: 
-            <input type="text" size="40" id="editPredecessors" value="{{ predecessors }}" /><button class="clearInput" onclick="EtherPlan.Helper.clear_input('editPredecessors')">x</button>
+            <input type="text" size="40" id="editPredecessors" value="{{ predecessors }}" placeholder="Predecessor ID"/><button class="clearInput" onclick="EtherPlan.Helper.clear_input('editPredecessors')">x</button>
             {{else}}
             <input type="hidden" id="editPredecessors" value="{{ predecessors }}" />
             {{/if}}
-            {{#if couldMoveTo}}<button id="moveTo">move to:</button> <input type="text" size="2" id="newOrder" />{{/if}}
+            {{#if couldMoveTo}}<br />{{ spaceLabel this }}<button id="moveTo">move to:</button> <input type="text" size="2" id="newOrder" />{{/if}}
             {{#if showDebug}}<button id="hideDebug">hide debug</button>{{else}}<button id="showDebug">show debug</button>{{/if}}
             
         </td>
@@ -134,9 +133,9 @@
     <tr class="edit">
         <td class="order">&nbsp;</td>
         <td colspan="4">
-            <small>
+            <br />
             <ol>
-                <li>id: {{_id}}</li>
+                <li>id: <span onclick="window.prompt ('Copy to clipboard: Ctrl+C, Enter', $(this).text());">{{_id}}</span></li>
                 <li>level: {{level}}</li>
                 <li>order: {{order}}</li>
                 <li>parent: {{parent}}</li>
@@ -146,7 +145,7 @@
                 <li>timestampCreated: {{timestampCreated}}</li> 
                 <li>timestampUpdated: {{timestampUpdated}}</li> 
             </ol>
-            </small>
+            <br />
         </td>
     </tr>
     {{/if}}

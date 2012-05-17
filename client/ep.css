@@ -92,8 +92,8 @@ table#parts tr th#headerOrder
 }
 table#parts input
 {
-	background-color: transparent;
-	border: 1px #222 solid !important;
+	background-color: #eee;
+	border: 1px #aaa solid !important;
 	border-radius: 4px;
 	color: #222;
 	font-family: 'Droid Sans', sans-serif;
@@ -267,7 +267,7 @@ table#parts input:focus
 .value
 {
 	text-align: left;
-	width: 30px;
+	width: 50px;
 }
 #iconActionCheck,#iconActionCheckEntry
 {
@@ -322,11 +322,11 @@ table#parts input:focus
 }
 .edit.isGroup input#editValue, .edit.isGroup input#editStart, .edit.isGroup input#editFinish, .hide
 {
-	xdisplay: none;
+	display: none;
 }
 .edit
 {
-	background-color: #efffef !important;
+	background-color: transparent;
 }
 
 #buttonBar, #banner, .icon, .showOrder, .showLabel, .showStart, .showFinish, .showValue, #parts th {

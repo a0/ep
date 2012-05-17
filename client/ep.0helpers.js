@@ -518,7 +518,7 @@ EtherPlan.Helper.update_values = function () {
             edges.push({from: part._id, to: part.parent});
         } 
         if (part.predecessors) {
-            edges.push({from: part._id, to: part.predecessors});
+            edges.push({to: part._id, from: part.predecessors});
         }
     });
 
@@ -527,7 +527,7 @@ EtherPlan.Helper.update_values = function () {
     
     // change start and finish
     for (var n=0;n<list.length;n++) {
-        //console.log(labels[list[n]]);
+        console.log(labels[list[n]]);
 
         var part = EtherPlan.Helper.get_part(list[n]);
         var parent = part.parent;
