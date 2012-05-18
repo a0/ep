@@ -12,6 +12,7 @@ EtherPlan.Action = {};
 
 EtherPlan.ENTER_KEY = 13;
 EtherPlan.LEVELSPACE = 4;
+EtherPlan.DATEFORMAT = "YYYY-MM-DD";
 
 Session.set('editing_part', null);
 Session.set('adding_part', null);
@@ -222,12 +223,12 @@ EtherPlan.Helper.inline_part = function(objPart) {
 
 EtherPlan.Helper.validate_move_part = function(oldOrder,newOrder) {
     if (newOrder <= 0) {
-        console.log("not moved, new order must be > 0");
+        //console.log("not moved, new order must be > 0");
         return false;        
     } 
     
     if (newOrder >= EtherPlan.Helper.size_doc()) {
-        console.log("not moved, new order must be < document size");
+        //console.log("not moved, new order must be < document size");
         return false;        
     }
 
@@ -235,7 +236,7 @@ EtherPlan.Helper.validate_move_part = function(oldOrder,newOrder) {
     var size = EtherPlan.Helper.size_tree(part._id);
     
     if (newOrder <= oldOrder+size && newOrder >= oldOrder) {
-        console.log("not moved to same location")
+        //console.log("not moved to same location")
         return false;
     }
     return true;
@@ -393,16 +394,21 @@ EtherPlan.Helper.add_working_days = function(start,days) {
     return candidate;
 }
 
+EtherPlan.Helper.format_date = function(date) {
+    var formatedDate = moment(date).format(EtherPlan.DATEFORMAT);
+    return formatedDate;
+}
+
 EtherPlan.Helper.update_finish = function(value,start,finish) {
     var days = parseInt(value.value);
-    var start = Date.parseFormat(start.value,"YYYY-MM-DD");
+    var start = Date.parseFormat(start.value,EtherPlan.DATEFORMAT);
     var add = EtherPlan.Helper.add_working_days(start,days);
-    finish.value = add.dateFormat("YYYY-MM-DD");
+    finish.value = EtherPlan.Helper.format_date(add);
 }
 
 EtherPlan.Helper.update_value = function(value,start,finish) {
-    var sDate = Date.parseFormat(start.value,"YYYY-MM-DD");
-    var fDate = Date.parseFormat(finish.value,"YYYY-MM-DD");
+    var sDate = Date.parseFormat(start.value,EtherPlan.DATEFORMAT);
+    var fDate = Date.parseFormat(finish.value,EtherPlan.DATEFORMAT);
 
     value.value = sDate.diff(fDate, 'businessdays')+1;
 }
@@ -532,22 +538,35 @@ EtherPlan.Helper.update_values = function () {
         } 
     });
 
+    // recursive call to fill predecessors to childs
+    var fill_preds = function(part,predecessors) {
+        var arrChilds = childs[part._id];
+        for (var k in arrChilds) {
+            var childId = arrChilds[k];
+            var childPart = EtherPlan.Helper.get_part(childId);
+
+            if (childPart.isGroup) {
+                fill_preds(childPart,predecessors);
+            } else {
+                edges.push({to: childId, from: predecessors});
+                if (!preds[childId]) {
+                    preds[childId] = [];
+                }
+                preds[childId].push(predecessors);
+                //console.log("** add pred: " + labels[childId] + " ///to\\\\\\ " + labels[predecessors]);
+            }
+        }
+    }
+
     // second find predecessors edges, fill preds array
     // if is group then every child have edge with predecessor
     EtherPlan.Parts.find({doc: Session.get('doc')}).forEach(function (part) {
         if (part.predecessors) {
             if (part.isGroup) {
-                arrChilds = childs[part._id];
-                for (var k in arrChilds) {
-                    edges.push({to: arrChilds[k], from: part.predecessors});
-                    if (!preds[arrChilds[k]]) {
-                        preds[arrChilds[k]] = [];
-                    }
-                    preds[arrChilds[k]].push(part.predecessors);
-                    console.log("** add pred: " + labels[arrChilds[k]] + " to " + labels[part.predecessors]);
-                }
+                fill_preds(part,part.predecessors);
             } else  {
                 edges.push({to: part._id, from: part.predecessors});
+                //console.log("** has pred: " + labels[part._id] + " ///to\\\\\\ " + labels[part.predecessors]);
                 if (!preds[part._id]) {
                     preds[part._id] = [];
                 }
@@ -561,29 +580,33 @@ EtherPlan.Helper.update_values = function () {
     
     // change start and finish
     for (var n=0;n<list.length;n++) {
-        console.log(labels[list[n]]);
+        //console.log("Topological sort: " + labels[list[n]]);
 
         var part = EtherPlan.Helper.get_part(list[n]);
         var parent = part.parent;
 
-        // predecessors move start and finish dates| 
+        // predecessors move start and finish dates
         if (preds[part._id]) {
-            var dateStartP = Date.parseFormat(part.start,"YYYY-MM-DD");
+            var dateStartP = Date.parseFormat(part.start,EtherPlan.DATEFORMAT);
             var arrPreds = preds[part._id];
             for (var k in arrPreds) {
-                console.log("Compare dates " + labels[part._id] + " using preds " + labels[arrPreds[k]]);
+                //console.log("Compare dates " + labels[part._id] + " using preds " + labels[arrPreds[k]]);
 
                 var d = EtherPlan.Helper.get_part(arrPreds[k]);
-                var dateFinishD = Date.parseFormat(d.finish,"YYYY-MM-DD");
+                var dateFinishD = Date.parseFormat(d.finish,EtherPlan.DATEFORMAT);
+                if (d.isGroup) {
+                    dateFinishD = Date.parseFormat(groups[arrPreds[k]].finish,EtherPlan.DATEFORMAT);
+                }
+                
                 if (dateFinishD > dateStartP) {
                     dateStartP = dateFinishD;
 
                     var add = EtherPlan.Helper.add_working_days(dateStartP,part.value);
-                    var newFinish = "" + add.dateFormat("YYYY-MM-DD");
-
-                    EtherPlan.Helper.set_part_value(part._id,"start",dateStartP);
+                    var newStart = EtherPlan.Helper.format_date(dateStartP);
+                    var newFinish = EtherPlan.Helper.format_date(add);
+                    EtherPlan.Helper.set_part_value(part._id,"start",newStart);
                     EtherPlan.Helper.set_part_value(part._id,"finish",newFinish);
-                    console.log("* Change dates " + labels[part._id] + " using preds " + labels[arrPreds[k]]);
+                    //console.log("* Change dates " + labels[part._id] + " using preds " + labels[arrPreds[k]]);
                 }
             }
         }
@@ -593,14 +616,14 @@ EtherPlan.Helper.update_values = function () {
             var gParent = groups[parent];
             var tPart = part;
             if (part.isGroup) {
-                tPart = groups[list[n]];
+                tPart = groups[part._id];
             }
 
-            var dateStartPart = Date.parseFormat(tPart.start,"YYYY-MM-DD");
-            var dateStartParent = Date.parseFormat(gParent.start,"YYYY-MM-DD");;
+            var dateStartPart = Date.parseFormat(tPart.start,EtherPlan.DATEFORMAT);
+            var dateStartParent = Date.parseFormat(gParent.start,EtherPlan.DATEFORMAT);;
 
-            var dateFinishPart = Date.parseFormat(tPart.finish,"YYYY-MM-DD");;
-            var dateFinishParent = Date.parseFormat(gParent.finish,"YYYY-MM-DD");;
+            var dateFinishPart = Date.parseFormat(tPart.finish,EtherPlan.DATEFORMAT);;
+            var dateFinishParent = Date.parseFormat(gParent.finish,EtherPlan.DATEFORMAT);;
 
             if (!dateStartParent || dateStartPart < dateStartParent) {
                 //console.log("DATES START: " + labels[parent] + "->" + tPart.start + " " + gParent.start);
@@ -616,8 +639,8 @@ EtherPlan.Helper.update_values = function () {
 
     for (var k in groups) {
         var g = groups[k];
-        var sDate = Date.parseFormat(g.start,"YYYY-MM-DD");
-        var fDate = Date.parseFormat(g.finish,"YYYY-MM-DD");
+        var sDate = Date.parseFormat(g.start,EtherPlan.DATEFORMAT);
+        var fDate = Date.parseFormat(g.finish,EtherPlan.DATEFORMAT);
         var newValue = sDate.diff(fDate, 'businessdays')+1;
 
         EtherPlan.Helper.set_part_value(k,"start",g.start);

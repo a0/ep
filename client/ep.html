@@ -89,7 +89,7 @@
 <template name="edit">
     <tr class="edit{{#if isGroup}} isGroup{{/if}}">
         <td class="order">{{ order }}</td>
-        <td>{{ spaceLabel this }}<input type="text" size="25" id="editLabel" value="{{ label }}" />
+        <td>{{ spaceLabel this }}<input type="text" size="40" id="editLabel" value="{{ label }}" />
             <span id="iconActionMinus" class="icon" title="REMOVE">&nbsp;</span>
             {{#if hasParent}}
                 <span id="iconActionPlus" class="icon"title="ADD">&nbsp;</span>
@@ -114,14 +114,13 @@
     {{#if showOptions}}
     <tr class="edit">
         <td class="order">&nbsp;</td>
-        <td colspan="4">{{ spaceLabel this }}
-            {{#if couldPredecessors}}
-            <input type="text" size="40" id="editPredecessors" value="{{ predecessors }}" placeholder="Predecessor ID"/><button class="clearInput" onclick="EtherPlan.Helper.clear_input('editPredecessors')">x</button>
+        <td colspan="4">{{ spaceLabel this }}{{#if couldPredecessors}}<input type="text" size="40" id="editPredecessors" value="{{ predecessors }}" placeholder="Predecessor ID"/><button class="clearInput" onclick="EtherPlan.Helper.clear_input('editPredecessors')">x</button>
             {{else}}
             <input type="hidden" id="editPredecessors" value="{{ predecessors }}" />
             {{/if}}
             {{#if couldMoveTo}}<br />{{ spaceLabel this }}<button id="moveTo">move to:</button> <input type="text" size="2" id="newOrder" />{{/if}}
             {{#if showDebug}}<button id="hideDebug">hide debug</button>{{else}}<button id="showDebug">show debug</button>{{/if}}
+            <br />{{ spaceLabel this }}id: <span onclick="window.prompt ('Copy to clipboard: Ctrl+C, Enter', $(this).text());">{{_id}}</span>
             
         </td>
     </tr>
@@ -135,7 +134,6 @@
         <td colspan="4">
             <br />
             <ol>
-                <li>id: <span onclick="window.prompt ('Copy to clipboard: Ctrl+C, Enter', $(this).text());">{{_id}}</span></li>
                 <li>level: {{level}}</li>
                 <li>order: {{order}}</li>
                 <li>parent: {{parent}}</li>

@@ -101,11 +101,15 @@ Template.entry.sizeTable = function () {
 };
 
 Template.entry.start = function() {
-    return this.finish;
+    var d = Date.parseFormat(this.finish,"YYYY-MM-DD");
+    var d1 = EtherPlan.Helper.add_working_days(d,2);
+    return EtherPlan.Helper.format_date(d1);
 }
 
 Template.entry.finish = function() {
-    return Date.parseFormat(this.finish,"YYYY-MM-DD").add(1,'businessdays').dateFormat("YYYY-MM-DD");
+    var d = Date.parseFormat(this.finish,"YYYY-MM-DD");
+    var d1 = EtherPlan.Helper.add_working_days(d,2);
+    return EtherPlan.Helper.format_date(d1);
 }
 
 Template.entry.predecessors = function() {

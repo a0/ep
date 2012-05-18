@@ -1,12 +1,8 @@
 $(function () {
-
-
     // from: https://github.com/juanpujol/meteor-scrum/blob/master/public/app.js
     $(document).bind("DOMSubtreeModified", function () {
-        //console.log("ya")
         initSortable();
     })
-
 
     var initSortable = function () {
             $("tbody.sortable").sortable({
@@ -44,5 +40,4 @@ $(function () {
             });
             return ui;
         };
-
 })
