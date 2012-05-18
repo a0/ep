@@ -379,11 +379,10 @@ EtherPlan.Helper.is_working_day = function(date) {
     }
 }
 
-
-EtherPlan.Helper.update_finish = function(value,start,finish) {
-    var stop = parseInt(value.value);
+EtherPlan.Helper.add_working_days = function(start,days) {
+    var stop = days;
     var counted = 0;
-    var candidate = Date.parseFormat(start.value,"YYYY-MM-DD");
+    var candidate = start;
 
     while(counted<(stop-1)) {
         candidate = candidate.add(1,'days');
@@ -391,7 +390,14 @@ EtherPlan.Helper.update_finish = function(value,start,finish) {
             counted++;
         }
     }
-    finish.value = candidate.dateFormat("YYYY-MM-DD");
+    return candidate;
+}
+
+EtherPlan.Helper.update_finish = function(value,start,finish) {
+    var days = parseInt(value.value);
+    var start = Date.parseFormat(start.value,"YYYY-MM-DD");
+    var add = EtherPlan.Helper.add_working_days(start,days);
+    finish.value = add.dateFormat("YYYY-MM-DD");
 }
 
 EtherPlan.Helper.update_value = function(value,start,finish) {
@@ -503,11 +509,13 @@ EtherPlan.Helper.topological_sort = function(edges, nodes) {
 EtherPlan.Helper.update_values = function () {
     var edges = [];
     var nodes = [];
-
     var labels = [];
     var groups = [];
+    var childs = [];
+    var preds = [];
 
-    // save old values and reset
+
+    // first find groups edges and fill nodes, labels, groups and childs arrays
     EtherPlan.Parts.find({doc: Session.get('doc')}).forEach(function (part) {
         if (part.isGroup) {
             groups[part._id] = {start: "",finish:""};
@@ -516,10 +524,36 @@ EtherPlan.Helper.update_values = function () {
         nodes.push(part._id);
         if (part.parent) {
             edges.push({from: part._id, to: part.parent});
+
+            if (!childs[part.parent]) {
+                childs[part.parent] = [];
+            }
+            childs[part.parent].push(part._id);
         } 
+    });
+
+    // second find predecessors edges, fill preds array
+    // if is group then every child have edge with predecessor
+    EtherPlan.Parts.find({doc: Session.get('doc')}).forEach(function (part) {
         if (part.predecessors) {
-            edges.push({to: part._id, from: part.predecessors});
-        }
+            if (part.isGroup) {
+                arrChilds = childs[part._id];
+                for (var k in arrChilds) {
+                    edges.push({to: arrChilds[k], from: part.predecessors});
+                    if (!preds[arrChilds[k]]) {
+                        preds[arrChilds[k]] = [];
+                    }
+                    preds[arrChilds[k]].push(part.predecessors);
+                    console.log("** add pred: " + labels[arrChilds[k]] + " to " + labels[part.predecessors]);
+                }
+            } else  {
+                edges.push({to: part._id, from: part.predecessors});
+                if (!preds[part._id]) {
+                    preds[part._id] = [];
+                }
+                preds[part._id].push(part.predecessors);
+            }
+        }   
     });
 
     // sort using topological sorting
@@ -532,6 +566,29 @@ EtherPlan.Helper.update_values = function () {
         var part = EtherPlan.Helper.get_part(list[n]);
         var parent = part.parent;
 
+        // predecessors move start and finish dates| 
+        if (preds[part._id]) {
+            var dateStartP = Date.parseFormat(part.start,"YYYY-MM-DD");
+            var arrPreds = preds[part._id];
+            for (var k in arrPreds) {
+                console.log("Compare dates " + labels[part._id] + " using preds " + labels[arrPreds[k]]);
+
+                var d = EtherPlan.Helper.get_part(arrPreds[k]);
+                var dateFinishD = Date.parseFormat(d.finish,"YYYY-MM-DD");
+                if (dateFinishD > dateStartP) {
+                    dateStartP = dateFinishD;
+
+                    var add = EtherPlan.Helper.add_working_days(dateStartP,part.value);
+                    var newFinish = "" + add.dateFormat("YYYY-MM-DD");
+
+                    EtherPlan.Helper.set_part_value(part._id,"start",dateStartP);
+                    EtherPlan.Helper.set_part_value(part._id,"finish",newFinish);
+                    console.log("* Change dates " + labels[part._id] + " using preds " + labels[arrPreds[k]]);
+                }
+            }
+        }
+
+        // parent is calculated using childs dates
         if (parent) {
             var gParent = groups[parent];
             var tPart = part;
