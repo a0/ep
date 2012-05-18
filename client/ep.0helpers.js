@@ -553,7 +553,7 @@ EtherPlan.Helper.update_values = function () {
                     preds[childId] = [];
                 }
                 preds[childId].push(predecessors);
-                //console.log("** add pred: " + labels[childId] + " ///to\\\\\\ " + labels[predecessors]);
+                console.log("** add pred: " + labels[childId] + " ///to\\\\\\ " + labels[predecessors]);
             }
         }
     }
@@ -566,7 +566,7 @@ EtherPlan.Helper.update_values = function () {
                 fill_preds(part,part.predecessors);
             } else  {
                 edges.push({to: part._id, from: part.predecessors});
-                //console.log("** has pred: " + labels[part._id] + " ///to\\\\\\ " + labels[part.predecessors]);
+                console.log("** has pred: " + labels[part._id] + " ///to\\\\\\ " + labels[part.predecessors]);
                 if (!preds[part._id]) {
                     preds[part._id] = [];
                 }
@@ -580,17 +580,19 @@ EtherPlan.Helper.update_values = function () {
     
     // change start and finish
     for (var n=0;n<list.length;n++) {
-        //console.log("Topological sort: " + labels[list[n]]);
+        console.log("Topological sort: " + labels[list[n]]);
 
         var part = EtherPlan.Helper.get_part(list[n]);
         var parent = part.parent;
+
+        var tPart = part;
 
         // predecessors move start and finish dates
         if (preds[part._id]) {
             var dateStartP = Date.parseFormat(part.start,EtherPlan.DATEFORMAT);
             var arrPreds = preds[part._id];
             for (var k in arrPreds) {
-                //console.log("Compare dates " + labels[part._id] + " using preds " + labels[arrPreds[k]]);
+                console.log("Compare dates " + labels[part._id] + " using preds " + labels[arrPreds[k]]);
 
                 var d = EtherPlan.Helper.get_part(arrPreds[k]);
                 var dateFinishD = Date.parseFormat(d.finish,EtherPlan.DATEFORMAT);
@@ -606,7 +608,9 @@ EtherPlan.Helper.update_values = function () {
                     var newFinish = EtherPlan.Helper.format_date(add);
                     EtherPlan.Helper.set_part_value(part._id,"start",newStart);
                     EtherPlan.Helper.set_part_value(part._id,"finish",newFinish);
-                    //console.log("* Change dates " + labels[part._id] + " using preds " + labels[arrPreds[k]]);
+                    console.log("* Change dates " + labels[part._id] + " using preds " + labels[arrPreds[k]]);
+
+                    tPart = {start: newStart, finish: newFinish};
                 }
             }
         }
@@ -614,7 +618,6 @@ EtherPlan.Helper.update_values = function () {
         // parent is calculated using childs dates
         if (parent) {
             var gParent = groups[parent];
-            var tPart = part;
             if (part.isGroup) {
                 tPart = groups[part._id];
             }
@@ -626,12 +629,12 @@ EtherPlan.Helper.update_values = function () {
             var dateFinishParent = Date.parseFormat(gParent.finish,EtherPlan.DATEFORMAT);;
 
             if (!dateStartParent || dateStartPart < dateStartParent) {
-                //console.log("DATES START: " + labels[parent] + "->" + tPart.start + " " + gParent.start);
+                console.log("DATES START: " + labels[parent] + "->" + tPart.start + " " + gParent.start);
                 gParent.start = tPart.start;
             }
 
             if (!dateFinishParent || dateFinishPart > dateFinishParent) {
-                //console.log("DATES FINISH: " + labels[parent] + "->"  + tPart.finish + " " + gParent.finish);
+                console.log("DATES FINISH: " + labels[parent] + "->"  + tPart.finish + " " + gParent.finish);
                 gParent.finish = tPart.finish;
             }
         }
