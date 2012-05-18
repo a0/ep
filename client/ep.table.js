@@ -57,6 +57,12 @@ Handlebars.registerHelper('spaceLabel', function (part) {
     return strSpaces;
 });
 
+Handlebars.registerHelper('depend', function (part) {
+    var predecessors = part.predecessors;
+    return EtherPlan.Helper.get_depend(predecessors);
+});
+
+
 Handlebars.registerHelper('spaceLabelEntry', function (part) {
     var numSpaces = EtherPlan.LEVELSPACE * part.level;
     var strSpaces = "";

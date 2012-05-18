@@ -33,7 +33,8 @@
                 <th id="headerLabel">PART</th>
                 <th id="headerStart">START</th>
                 <th id="headerFinish">FINISH</th>
-                <th id="headerValue">Δ</th>
+                <th id="headerDepend" title="Predecessors">⇖</th>
+                <th id="headerValue" title="Duration">Δ</th>
             </tr>
         </thead>
         <tbody class="sortable">
@@ -58,8 +59,6 @@
                 <span id="iconArrowDown" class="icon">&nbsp;</span>
                 <span id="iconArrowUp" class="icon">&nbsp;</span>
                 <span id="iconArrowRight" class="icon">&nbsp;</span>
-                <span id="iconCheck" class="icon">&nbsp;</span>
-                <span id="iconX" class="icon">&nbsp;</span>
             </span>
         {{/if}} 
     {{/if}} 
@@ -79,9 +78,10 @@
 <template name="show">
     <tr class="{{#if isGroup}}isGroup{{/if}}">
         <td class="order showOrder">{{ order }}</td>
-        <td class="showLabel">{{ spaceLabel this }}{{ label }}</td>
+        <td class="label showLabel">{{ spaceLabel this }}{{ label }}</td>
         <td class="start showStart">{{ start }}</td>
         <td class="finish showFinish">{{ finish }}</td>
+        <td class="depend showDepend">{{ depend this }}</td>
         <td class="value showValue">{{ value }}</td>
     </tr>
 </template>
@@ -89,7 +89,9 @@
 <template name="edit">
     <tr class="edit{{#if isGroup}} isGroup{{/if}}">
         <td class="order">{{ order }}</td>
-        <td>{{ spaceLabel this }}<input type="text" size="40" id="editLabel" value="{{ label }}" />
+        <td class="label">{{ spaceLabel this }}<input type="text" size="40" id="editLabel" value="{{ label }}" />
+            <span id="iconActionCheck" title="SEND CHANGES">&nbsp;</span>
+            <span id="iconActionX" title="CANCEL CHANGES">&nbsp;</span>
             <span id="iconActionMinus" class="icon" title="REMOVE">&nbsp;</span>
             {{#if hasParent}}
                 <span id="iconActionPlus" class="icon"title="ADD">&nbsp;</span>
@@ -100,66 +102,77 @@
             {{#if couldUp}}<span id="iconActionArrowUp" class="icon" title="MOVE UP">&nbsp;</span>{{/if}}
             {{#if couldDown}}<span id="iconActionArrowDown" class="icon" title="MOVE DOWN">&nbsp;</span>{{/if}}
             {{#if couldOutline}}<span id="iconActionArrowRight" class="icon" title="MOVE OUTLINE">&nbsp;</span>{{/if}}
-            <span id="iconActionCheck" class="icon" title="SEND CHANGES">&nbsp;</span>
-            <span id="iconActionX" class="icon" title="CANCEL CHANGES">&nbsp;</span>{{#if showOptions}}<button id="hideOptions"> less options </button>{{else}}<button id="showOptions"> more options </button>{{/if}}
+
+            {{#if couldDebug}}
+            {{#if showOptions}}<button id="hideOptions"> less options </button>{{else}}<button id="showOptions"> more options </button>{{/if}}
+            <div id="dialogEditForm" class="{{#if showOptions}}no{{/if}}hide" title="Edit Part">
+                <br />
+                <hr />
+                <br />
+                {{#if couldPredecessors}}
+                    <input type="text" size="40" id="editPredecessors" value="{{ predecessors }}" placeholder="Predecessor ID"/>
+                    <button class="clearInput" onclick="EtherPlan.Helper.clear_input('editPredecessors')">x</button>
+                {{else}}
+                    <input type="hidden" id="editPredecessors" value="{{ predecessors }}" />
+                {{/if}}
+                
+                {{#if couldMoveTo}}
+                    <br />
+                    <br />
+                    <button id="moveTo">move to:</button> <input type="text" size="2" id="newOrder" />
+                {{/if}}
+                
+                <br />
+                <br />
+                id: <span onclick="window.prompt ('Copy to clipboard: Ctrl+C, Enter', $(this).text());">{{_id}}</span>
+                
+                <br />
+                <br />
+                {{#if showDebug}}<button id="hideDebug"> hide debug </button>{{else}}<button id="showDebug"> show debug </button>{{/if}}
+                <br />
+                <hr />
+                <br />
+                {{#if showDebug}}
+                <ol>
+                    <li>label: {{label}}</li>
+                    <li>value: {{value}}</li>
+                    <li>level: {{level}}</li>
+                    <li>order: {{order}}</li>
+                    <li>parent: {{parent}}</li>
+                    <li>predecessors: {{predecessors}}</li>
+                    <li>start: {{start}}</li>
+                    <li>finish: {{finish}}</li>
+                    <li>timestampCreated: {{timestampCreated}}</li> 
+                    <li>timestampUpdated: {{timestampUpdated}}</li> 
+                </ol>
+                {{/if}}
+            </div>
+            {{/if}}
+
+
         </td>
-        <td class="start">
-            <input type="text" size="10" id="editStart" value="{{ start }}" onchange="EtherPlan.Helper.edit_update_finish()" onclick="$('#editStart').datepicker({dateFormat: 'yy-mm-dd'}); $('#editStart').datepicker('show');" />
-        </td>
-        <td class="finish">
-            <input type="text" size="10" id="editFinish" value="{{ finish }}" onchange="EtherPlan.Helper.edit_update_value()" onclick="$('#editFinish').datepicker({dateFormat: 'yy-mm-dd'}); $('#editFinish').datepicker('show');" />
-        </td>
+        <td class="start"><input type="text" size="10" id="editStart" value="{{ start }}" onchange="EtherPlan.Helper.edit_update_finish()" onclick="$('#editStart').datepicker({dateFormat: 'yy-mm-dd'}); $('#editStart').datepicker('show');" /></td>
+        <td class="finish"><input type="text" size="10" id="editFinish" value="{{ finish }}" onchange="EtherPlan.Helper.edit_update_value()" onclick="$('#editFinish').datepicker({dateFormat: 'yy-mm-dd'}); $('#editFinish').datepicker('show');" /></td>
+        <td class="depend"><input type="text" size="2" id="editDepend" value="{{ depend this }}" onkeypress="return EtherPlan.Helper.is_number_key(event)" /></td>
         <td class="value"><input type="text" size="2" id="editValue" value="{{ value }}" onchange="EtherPlan.Helper.edit_update_finish()" onkeypress="return EtherPlan.Helper.is_number_key(event)" /></td>
     </tr>
-    {{#if showOptions}}
-    <tr class="edit">
-        <td class="order">&nbsp;</td>
-        <td colspan="4">{{ spaceLabel this }}{{#if couldPredecessors}}<input type="text" size="40" id="editPredecessors" value="{{ predecessors }}" placeholder="Predecessor ID"/><button class="clearInput" onclick="EtherPlan.Helper.clear_input('editPredecessors')">x</button>
-            {{else}}
-            <input type="hidden" id="editPredecessors" value="{{ predecessors }}" />
-            {{/if}}
-            {{#if couldMoveTo}}<br />{{ spaceLabel this }}<button id="moveTo">move to:</button> <input type="text" size="2" id="newOrder" />{{/if}}
-            {{#if showDebug}}<button id="hideDebug">hide debug</button>{{else}}<button id="showDebug">show debug</button>{{/if}}
-            <br />{{ spaceLabel this }}id: <span onclick="window.prompt ('Copy to clipboard: Ctrl+C, Enter', $(this).text());">{{_id}}</span>
             
         </td>
     </tr>
-    {{else}}
-            
-            <input type="hidden" id="editPredecessors" value="{{ predecessors }}" />
-    {{/if}}
-    {{#if showDebug}}
-    <tr class="edit">
-        <td class="order">&nbsp;</td>
-        <td colspan="4">
-            <br />
-            <ol>
-                <li>level: {{level}}</li>
-                <li>order: {{order}}</li>
-                <li>parent: {{parent}}</li>
-                <li>predecessors: {{predecessors}}</li>
-                <li>start: {{start}}</li>
-                <li>finish: {{finish}}</li>
-                <li>timestampCreated: {{timestampCreated}}</li> 
-                <li>timestampUpdated: {{timestampUpdated}}</li> 
-            </ol>
-            <br />
-        </td>
-    </tr>
-    {{/if}}
 </template>
 
 <template name="entry">
     <tr class="edit">
         <td class="order">&nbsp;</td>
-        <td>{{ spaceLabelEntry this }}<input type="text" size="25" id="entryLabel" value="Part {{ sizeTable }}" />
+        <td class="label">{{ spaceLabelEntry this }}<input type="text" size="40" id="entryLabel" value="Part {{ sizeTable }}" />
+            <span id="iconActionCheckEntry" title="SEND">&nbsp;</span>
+            <span id="iconActionXEntry" title="CANCEL">&nbsp;</span>
             <input type="hidden" id="entryParent" value="{{ _id }}" />
             <input type="hidden" size="2" id="entryPredecessors" value="" />
-            <span id="iconActionCheckEntry" class="icon">&nbsp;</span>
-            <span id="iconActionXEntry" class="icon">&nbsp;</span>
         </td>
         <td class="start"><input type="text" size="9" id="entryStart" value="{{start}}" onchange="EtherPlan.Helper.entry_update_finish()" onclick="$('#entryStart').datepicker({dateFormat: 'yy-mm-dd'}); $('#entryStart').datepicker('show');" /></td>
         <td class="finish"><input type="text" size="9" id="entryFinish" value="{{finish}}" onchange="EtherPlan.Helper.entry_update_value()" onclick="$('#entryFinish').datepicker({dateFormat: 'yy-mm-dd'}); $('#entryFinish').datepicker('show');" /></td>
+        <td class="depend"><input type="text" size="2" id="entryDepend" value="ya" /></td>
         <td class="value"><input type="text" size="2" id="entryValue" value="1" onchange="EtherPlan.Helper.entry_update_finish()" onkeypress="return EtherPlan.Helper.is_number_key(event)" /></td>
     </tr>
 </template>
@@ -167,12 +180,13 @@
 <template name="entryNew">
     <tr class="edit">
         <td class="order">&nbsp;</td>
-        <td colspan="4"><input type="text"  size="25" id="entryLabel" value="WHOLE" />
+        <td colspan="5"><input type="text" size="40" id="entryLabel" value="WHOLE" />
+            <span id="iconActionCheck" title="SEND">&nbsp;</span>
             <input type="hidden" id="entryValue" value="0" />
             <input type="hidden" id="entryParent" value="" />
+            <input type="hidden" id="entryDepend" value="" />
             <input type="hidden" id="entryStart" value="{{start}}" />
             <input type="hidden" id="entryFinish" value="{{finish}}" />
-            <span id="iconActionCheck" class="icon">&nbsp;</span>
         </td>
     </tr>
 </template>

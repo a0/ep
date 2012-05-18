@@ -40,8 +40,16 @@ EtherPlan.Action.clickValue = function (evt) {
     }
 };
 
+EtherPlan.Action.clickDepend = function (evt) {
+    Session.set('adding_brother_part', null);
+    Session.set('adding_part', null);
+    Session.set('editing_part', this._id);
+    Session.set('field_edit','editDepend');
+};
+
 Template.part.events = {
     'click .showLabel': EtherPlan.Action.clickLabel,
+    'click .showDepend': EtherPlan.Action.clickDepend,
     'click .showStart': EtherPlan.Action.clickStart,
     'click .showFinish': EtherPlan.Action.clickFinish,
     'click .showValue': EtherPlan.Action.clickValue

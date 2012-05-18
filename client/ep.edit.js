@@ -5,6 +5,10 @@ EtherPlan.Action.editSend = function (text, evt) {
     var finish = document.getElementById('editFinish');
     var predecessors = document.getElementById('editPredecessors');
 
+    var dependOld = EtherPlan.Helper.get_depend(this.predecessors);
+    var dependNew = document.getElementById('editDepend');
+
+
     if (this.label != label.value) {
         EtherPlan.Helper.set_part_value(this._id,"label",label.value);
     }
@@ -17,7 +21,17 @@ EtherPlan.Action.editSend = function (text, evt) {
     if (this.finish != start.finish) {
         EtherPlan.Helper.set_part_value(this._id,"finish",finish.value);
     }
-    if (this.predecessors != predecessors.value) {
+    if (dependOld != dependNew.value) {
+        if (dependNew.value == "") {
+            EtherPlan.Helper.set_part_value(this._id,"predecessors","");
+        } else {
+            var p = EtherPlan.Helper.get_part_id_by_order(dependNew.value);
+            if (p) {
+                EtherPlan.Helper.set_part_value(this._id,"predecessors",p);
+            }
+        }
+    }
+    if (predecessors && this.predecessors != predecessors.value) {
         EtherPlan.Helper.set_part_value(this._id,"predecessors",predecessors.value);
     }
 
@@ -144,6 +158,10 @@ Template.edit.couldDown = function () {
         return true;
     }
 };
+
+Template.edit.couldDebug = function () {
+    return EtherPlan.DEBUG;
+}
 
 Template.edit.couldUp = function () {
     if (this.order <= 1) {
