@@ -31,10 +31,10 @@
             <tr>
                 <th id="headerOrder">ID</th>
                 <th id="headerLabel">PART</th>
+                <th id="headerDepend" title="Predecessors">&nbsp;</th>
                 <th id="headerStart">START</th>
                 <th id="headerFinish">FINISH</th>
-                <th id="headerDepend" title="Predecessors">⇖</th>
-                <th id="headerValue" title="Duration">Δ</th>
+                <th id="headerValue" title="Duration">&nbsp;</th>
             </tr>
         </thead>
         <tbody class="sortable">
@@ -79,9 +79,9 @@
     <tr class="{{#if isGroup}}isGroup{{/if}}">
         <td class="order showOrder">{{ order }}</td>
         <td class="label showLabel">{{ spaceLabel this }}{{ label }}</td>
+        <td class="depend showDepend">{{ depend this }}</td>
         <td class="start showStart">{{ start }}</td>
         <td class="finish showFinish">{{ finish }}</td>
-        <td class="depend showDepend">{{ depend this }}</td>
         <td class="value showValue">{{ value }}</td>
     </tr>
 </template>
@@ -151,9 +151,9 @@
 
 
         </td>
+        <td class="depend"><input type="text" size="2" id="editDepend" value="{{ depend this }}" onkeypress="return EtherPlan.Helper.is_number_key(event)" /></td>
         <td class="start"><input type="text" size="10" id="editStart" value="{{ start }}" onchange="EtherPlan.Helper.edit_update_finish()" onclick="$('#editStart').datepicker({dateFormat: 'yy-mm-dd'}); $('#editStart').datepicker('show');" /></td>
         <td class="finish"><input type="text" size="10" id="editFinish" value="{{ finish }}" onchange="EtherPlan.Helper.edit_update_value()" onclick="$('#editFinish').datepicker({dateFormat: 'yy-mm-dd'}); $('#editFinish').datepicker('show');" /></td>
-        <td class="depend"><input type="text" size="2" id="editDepend" value="{{ depend this }}" onkeypress="return EtherPlan.Helper.is_number_key(event)" /></td>
         <td class="value"><input type="text" size="2" id="editValue" value="{{ value }}" onchange="EtherPlan.Helper.edit_update_finish()" onkeypress="return EtherPlan.Helper.is_number_key(event)" /></td>
     </tr>
             
@@ -170,9 +170,9 @@
             <input type="hidden" id="entryParent" value="{{ _id }}" />
             <input type="hidden" size="2" id="entryPredecessors" value="" />
         </td>
+        <td class="depend"><input type="text" size="2" id="entryDepend" value="" /></td>
         <td class="start"><input type="text" size="9" id="entryStart" value="{{start}}" onchange="EtherPlan.Helper.entry_update_finish()" onclick="$('#entryStart').datepicker({dateFormat: 'yy-mm-dd'}); $('#entryStart').datepicker('show');" /></td>
         <td class="finish"><input type="text" size="9" id="entryFinish" value="{{finish}}" onchange="EtherPlan.Helper.entry_update_value()" onclick="$('#entryFinish').datepicker({dateFormat: 'yy-mm-dd'}); $('#entryFinish').datepicker('show');" /></td>
-        <td class="depend"><input type="text" size="2" id="entryDepend" value="ya" /></td>
         <td class="value"><input type="text" size="2" id="entryValue" value="1" onchange="EtherPlan.Helper.entry_update_finish()" onkeypress="return EtherPlan.Helper.is_number_key(event)" /></td>
     </tr>
 </template>

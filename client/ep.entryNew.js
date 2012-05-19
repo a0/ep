@@ -31,9 +31,9 @@ Template.entryNew.events[EtherPlan.Helper.okcancel_events('#entryLabel')] = Ethe
 });
 
 Template.entryNew.start = function() {
-    return (new Date()).dateFormat("YYYY-MM-DD");
+    return EtherPlan.Helper.format_date(moment());
 }
 
 Template.entryNew.finish = function() {
-    return (new Date()).dateFormat("YYYY-MM-DD");
+    return EtherPlan.Helper.format_date(moment());
 }

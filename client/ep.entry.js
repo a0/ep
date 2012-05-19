@@ -4,6 +4,7 @@ EtherPlan.Action.entry = function (text, evt) {
     var value = document.getElementById('entryValue');
     var start = document.getElementById('entryStart');
     var finish = document.getElementById('entryFinish');
+    var depend = document.getElementById('entryDepend');
     var predecessors = document.getElementById('entryPredecessors');
 
     var objParent = EtherPlan.Parts.findOne(parent.value);
@@ -31,6 +32,8 @@ EtherPlan.Action.entry = function (text, evt) {
         EtherPlan.Helper.set_part_value(changes[i].id,"order",changes[i].newOrder);
     }
 
+
+
     var objEntry = {
         parent: objParent._id,
         order: order,
@@ -46,6 +49,13 @@ EtherPlan.Action.entry = function (text, evt) {
 
     if (predecessors.value != "") {
         objEntry['predecessors'] = predecessors.value;
+    }
+
+    if (depend.value != "") {
+        var p = EtherPlan.Helper.get_part_id_by_order(depend.value);
+        if (p) {
+            objEntry['predecessors'] = p;
+        }
     }
 
     var newPart = EtherPlan.Parts.insert(objEntry);
@@ -101,13 +111,13 @@ Template.entry.sizeTable = function () {
 };
 
 Template.entry.start = function() {
-    var d = Date.parseFormat(this.finish,"YYYY-MM-DD");
+    var d = EtherPlan.Helper.parse_date(this.finish);
     var d1 = EtherPlan.Helper.add_working_days(d,2);
     return EtherPlan.Helper.format_date(d1);
 }
 
 Template.entry.finish = function() {
-    var d = Date.parseFormat(this.finish,"YYYY-MM-DD");
+    var d = EtherPlan.Helper.parse_date(this.finish);
     var d1 = EtherPlan.Helper.add_working_days(d,2);
     return EtherPlan.Helper.format_date(d1);
 }

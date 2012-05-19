@@ -30,9 +30,12 @@ table#parts tr td
 }
 table#parts tr th
 {
-	background: #fff;
 	font-size: 16px;
 	text-align: left;
+}
+table#parts thead tr
+{
+	background: #aaa;
 }
 table#parts tr td,table#parts tr th
 {
@@ -50,9 +53,9 @@ table#parts tr:hover
 {
 	background: #ddd;
 }
-table#parts tr th
+table#parts thead tr:hover
 {
-	background: #aaa;;
+	background: #aaa;
 }
 
 
@@ -326,10 +329,12 @@ table#parts input:focus
 #headerValue
 {
 	width: 40px;
+	background: url(/iconic/black/clock_16x16.png) no-repeat 5px center;
 }
 #headerDepend
 {
 	width: 40px;
+	background: url(/iconic/black/link_16x16.png) no-repeat 5px center;
 }
 .order:hover
 {

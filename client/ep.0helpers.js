@@ -12,7 +12,7 @@ EtherPlan.Action = {};
 EtherPlan.ENTER_KEY = 13;
 EtherPlan.LEVELSPACE = 4;
 EtherPlan.DATEFORMAT = "YYYY-MM-DD";
-EtherPlan.DEBUG = false;
+EtherPlan.DEBUG = true;
 
 Session.set('editing_part', null);
 Session.set('adding_part', null);
@@ -20,6 +20,19 @@ Session.set('adding_brother_part', null);
 Session.set('doc', null);
 Session.set('show_options', false);
 Session.set('show_debug', true);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // from meteor samples
@@ -47,6 +60,175 @@ EtherPlan.Helper.make_okcancel_handler = function (options) {
         }
     };
 };
+
+// from: http://stackoverflow.com/questions/2808184/restricting-input-to-textbox-allowing-only-numbers-and-decimal-point
+EtherPlan.Helper.is_number_key = function (evt) {
+    var charCode = (evt.which) ? evt.which : event.keyCode
+    if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57)) return false;
+    return true;
+}
+
+// from: http://stackoverflow.com/questions/613114/little-x-in-textfield-input-on-the-iphone-in-mobilesafari
+EtherPlan.Helper.clear_input = function (id) {
+    $("#" + id).get(0).value = "";
+    return false;
+}
+
+EtherPlan.Helper.log = function (log) {
+    if (EtherPlan.DEBUG) {
+        console.log(log);
+    }
+}
+
+EtherPlan.Helper.is_working_day = function (m) {
+    if (m.day() == 6 || m.day() == 0) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+EtherPlan.Helper.add_working_days = function (mStart, days) {
+    var stop = days;
+    var counted = 0;
+    var candidate = moment(mStart);
+    candidate.setHours(10);
+
+    while (counted < (stop - 1)) {
+        candidate = candidate.add('d', 1);
+        EtherPlan.Helper.log(candidate);
+        if (EtherPlan.Helper.is_working_day(candidate)) {
+            EtherPlan.Helper.log("is working day");
+            counted++;
+        }
+    }
+    return candidate;
+}
+
+EtherPlan.Helper.format_date = function (m) {
+    return m.format(EtherPlan.DATEFORMAT);
+}
+
+
+EtherPlan.Helper.parse_date = function (str) {
+    return moment(str, EtherPlan.DATEFORMAT);
+}
+
+EtherPlan.Helper.diff_dates_working_days = function (strDateStart, strDateFinish) {
+    mStart = moment(strDateStart, EtherPlan.DATEFORMAT);
+    mFinish = moment(strDateFinish, EtherPlan.DATEFORMAT);
+
+    var count = 1;
+    var mTemp = moment(mStart);
+    mTemp.add('d', 1);
+
+    while (mTemp <= mFinish) {
+        if (EtherPlan.Helper.is_working_day(mTemp)) {
+            count++;
+        }
+        mTemp.add('d', 1);
+    }
+    return count;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EtherPlan.Helper.get_part_id_by_order = function (order) {
+    if (order) {
+        var part = EtherPlan.Parts.findOne({
+            doc: Session.get('doc'),
+            order: parseInt(order)
+        });
+        if (part) {
+            return part._id;
+        } else {
+            EtherPlan.Helper.log("not find part order " + order);
+        }
+    } else {
+        EtherPlan.Helper.log("need order");
+    }
+    return undefined;
+}
+
+EtherPlan.Helper.get_depend = function (predecessors) {
+    if (predecessors) {
+        var partDepend = EtherPlan.Helper.get_part(predecessors);
+        if (partDepend) {
+            return partDepend.order;
+        } else {
+            EtherPlan.Helper.log("Couldn't find predecessors" + predecessors + " for " + part._id);
+        }
+    }
+    return "";
+}
+
+EtherPlan.Helper.size_doc = function (partId) {
+    return EtherPlan.Parts.find({
+        doc: Session.get('doc')
+    }).count();
+}
+
+EtherPlan.Helper.get_part = function (partId) {
+    return EtherPlan.Parts.findOne(partId);
+}
+
+EtherPlan.Helper.set_part_value = function (partId, field, value) {
+    var obj = {};
+    obj[field] = value;
+    obj['timestampUpdated'] = (new Date()).getTime();
+    // TODO: make more secure
+    EtherPlan.Parts.update(partId, {
+        $set: obj
+    });
+    EtherPlan.Helper.log("set value for " + partId + " {" + field + "," + value + "}")
+}
+
+EtherPlan.Helper.delete_part = function (partId) {
+    // TODO: make more secure
+    EtherPlan.Parts.remove(partId);
+    //Meteor.call('deletePart',{_id: partId});
+    //Meteor.flush();
+}
+
+// from etherpad
+EtherPlan.Helper.go_name = function () {
+    var planName = document.getElementById("planName").value;
+    planName.length > 0 ? window.location = "" + planName : alert("Please enter a name")
+}
+
+// from etherpad
+EtherPlan.Helper.go_random = function () {
+    window.location = "" + EtherPlan.Helper.random_plan_name();
+}
+
+// from etherpad
+EtherPlan.Helper.random_plan_name = function () {
+    var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    var string_length = 10;
+    var randomstring = '';
+    for (var i = 0; i < string_length; i++) {
+        var rnum = Math.floor(Math.random() * chars.length);
+        randomstring += chars.substring(rnum, rnum + 1);
+    }
+    return randomstring;
+}
 
 // from http://befused.com/javascript/get-filename-url
 EtherPlan.Helper.get_doc = function () {
@@ -78,28 +260,15 @@ EtherPlan.Helper.find_last_leaf = function (objParent) {
     }
 }
 
-EtherPlan.Helper.update_orders = function () {
-    var h = {};
-    var old = {};
-    var count = 0;
-
-    // save old order
-    EtherPlan.Parts.find({
-        doc: Session.get('doc')
-    }, {
-        sort: {
-            order: 1
-        }
-    }).forEach(function (part) {
-        old[part._id] = part.order;
-        h[part._id] = count++;
-    });
-
-    // update only changed order
-    for (var k in h) {
-        if (h[k] != old[k]) {
-            EtherPlan.Helper.set_part_value(k, "order", h[k]);
-        }
+EtherPlan.Helper.has_childs = function (partId) {
+    var count = EtherPlan.Parts.find({
+        doc: Session.get('doc'),
+        parent: partId
+    }).count();
+    if (count > 0) {
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -123,15 +292,126 @@ EtherPlan.Helper.remove_childs = function (objParent) {
     EtherPlan.Helper.delete_part(objParent._id);
 }
 
-EtherPlan.Helper.has_childs = function (partId) {
-    var count = EtherPlan.Parts.find({
-        doc: Session.get('doc'),
-        parent: partId
-    }).count();
-    if (count > 0) {
-        return true;
-    } else {
-        return false;
+
+EtherPlan.Helper.size_tree = function (partId) {
+    var value = 0;
+    var objPart = EtherPlan.Helper.get_part(partId);
+    if (objPart.isGroup) {
+        EtherPlan.Parts.find({
+            doc: Session.get('doc'),
+            parent: partId
+        }, {
+            sort: {
+                order: 1
+            }
+        }).forEach(function (part) {
+            if (part.isGroup) {
+                value = value + EtherPlan.Helper.size_tree(part._id) + 1;
+            } else {
+                value++;
+            }
+        });
+    }
+    return value;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EtherPlan.Helper.update_finish = function (value, start, finish) {
+    var days = parseInt(value.value);
+    var start = EtherPlan.Helper.parse_date(start.value);
+    var add = EtherPlan.Helper.add_working_days(start, days);
+    finish.value = EtherPlan.Helper.format_date(add);
+}
+
+EtherPlan.Helper.update_value = function (value, start, finish) {
+    value.value = EtherPlan.Helper.diff_dates_working_days(start.value, finish.value);
+}
+
+EtherPlan.Helper.edit_update_finish = function () {
+    var value = document.getElementById('editValue');
+    var start = document.getElementById('editStart');
+    var finish = document.getElementById('editFinish');
+
+    EtherPlan.Helper.update_finish(value, start, finish);
+}
+
+EtherPlan.Helper.edit_update_value = function () {
+    var value = document.getElementById('editValue');
+    var start = document.getElementById('editStart');
+    var finish = document.getElementById('editFinish');
+
+    EtherPlan.Helper.update_value(value, start, finish);
+}
+
+EtherPlan.Helper.entry_update_finish = function () {
+    var value = document.getElementById('entryValue');
+    var start = document.getElementById('entryStart');
+    var finish = document.getElementById('entryFinish');
+
+    EtherPlan.Helper.update_finish(value, start, finish);
+}
+
+EtherPlan.Helper.entry_update_value = function () {
+    var value = document.getElementById('entryValue');
+    var start = document.getElementById('entryStart');
+    var finish = document.getElementById('entryFinish');
+
+    EtherPlan.Helper.update_value(value, start, finish);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EtherPlan.Helper.update_orders = function () {
+    var h = {};
+    var old = {};
+    var count = 0;
+
+    // save old order
+    EtherPlan.Parts.find({
+        doc: Session.get('doc')
+    }, {
+        sort: {
+            order: 1
+        }
+    }).forEach(function (part) {
+        old[part._id] = part.order;
+        h[part._id] = count++;
+    });
+
+    // update only changed order
+    for (var k in h) {
+        if (h[k] != old[k]) {
+            EtherPlan.Helper.set_part_value(k, "order", h[k]);
+        }
     }
 }
 
@@ -189,19 +469,6 @@ EtherPlan.Helper.outline_part = function (objPart) {
     EtherPlan.Helper.update_values();
 }
 
-EtherPlan.Helper.remove_part = function (objPart) {
-    var parent = objPart.parent;
-    EtherPlan.Helper.remove_childs(EtherPlan.Parts.findOne(objPart._id));
-    if (parent) {
-        var parentIsGroup = EtherPlan.Helper.get_part(parent).isGroup;
-        if (!EtherPlan.Helper.has_childs(parent) && parentIsGroup) {
-            EtherPlan.Helper.set_part_value(parent, "isGroup", false);
-        }
-    }
-    EtherPlan.Helper.update_values();
-    EtherPlan.Helper.update_orders();
-}
-
 EtherPlan.Helper.inline_part = function (objPart) {
     var objParent = EtherPlan.Helper.get_part(objPart.parent);
     var oldParent = objPart.parent;
@@ -248,10 +515,17 @@ EtherPlan.Helper.inline_part = function (objPart) {
     EtherPlan.Helper.update_values();
 }
 
-EtherPlan.Helper.log = function (log) {
-    if (EtherPlan.DEBUG) {
-        console.log(log);
+EtherPlan.Helper.remove_part = function (objPart) {
+    var parent = objPart.parent;
+    EtherPlan.Helper.remove_childs(EtherPlan.Parts.findOne(objPart._id));
+    if (parent) {
+        var parentIsGroup = EtherPlan.Helper.get_part(parent).isGroup;
+        if (!EtherPlan.Helper.has_childs(parent) && parentIsGroup) {
+            EtherPlan.Helper.set_part_value(parent, "isGroup", false);
+        }
     }
+    EtherPlan.Helper.update_values();
+    EtherPlan.Helper.update_orders();
 }
 
 EtherPlan.Helper.validate_move_part = function (oldOrder, newOrder) {
@@ -392,195 +666,6 @@ EtherPlan.Helper.move_part = function (oldOrder, newOrder) {
 }
 
 
-EtherPlan.Helper.size_tree = function (partId) {
-    var value = 0;
-    var objPart = EtherPlan.Helper.get_part(partId);
-    if (objPart.isGroup) {
-        EtherPlan.Parts.find({
-            doc: Session.get('doc'),
-            parent: partId
-        }, {
-            sort: {
-                order: 1
-            }
-        }).forEach(function (part) {
-            if (part.isGroup) {
-                value = value + EtherPlan.Helper.size_tree(part._id) + 1;
-            } else {
-                value++;
-            }
-        });
-    }
-    return value;
-}
-
-
-EtherPlan.Helper.get_part_id_by_order = function(order) {
-    if (order) {
-console.log(parseInt(order))
-        var part = EtherPlan.Parts.findOne({doc: Session.get('doc'), order: parseInt(order)});
-console.log(part)
-        if (part) {
-            return part._id;
-        } else {
-            EtherPlan.Helper.log("not find part order " + order );
-        }
-    } else {
-        EtherPlan.Helper.log("need order");
-    }
-    return undefined;
-}
-
-EtherPlan.Helper.get_depend = function (predecessors) {
-    if (predecessors) {
-        var partDepend = EtherPlan.Helper.get_part(predecessors);
-        if (partDepend) {
-            return partDepend.order;
-        } else {
-            EtherPlan.Helper.log("Couldn't find predecessors" + predecessors + " for " + part._id);
-        } 
-    } 
-    return "";
-}
-
-
-EtherPlan.Helper.size_doc = function (partId) {
-    return EtherPlan.Parts.find({
-        doc: Session.get('doc')
-    }).count();
-}
-
-EtherPlan.Helper.get_part = function (partId) {
-    return EtherPlan.Parts.findOne(partId);
-}
-
-EtherPlan.Helper.set_part_value = function (partId, field, value) {
-    var obj = {};
-    obj[field] = value;
-    obj['timestampUpdated'] = (new Date()).getTime();
-    // TODO: make more secure
-    EtherPlan.Parts.update(partId, {
-        $set: obj
-    });
-    EtherPlan.Helper.log("set value for " + partId + " {" + field + "," + value + "}")
-}
-
-EtherPlan.Helper.delete_part = function (partId) {
-    // TODO: make more secure
-    EtherPlan.Parts.remove(partId);
-    //Meteor.call('deletePart',{_id: partId});
-    //Meteor.flush();
-}
-
-// from etherpad
-EtherPlan.Helper.go_name = function () {
-    var planName = document.getElementById("planName").value;
-    planName.length > 0 ? window.location = "" + planName : alert("Please enter a name")
-}
-
-// from etherpad
-EtherPlan.Helper.go_random = function () {
-    window.location = "" + EtherPlan.Helper.random_plan_name();
-}
-
-// from etherpad
-EtherPlan.Helper.random_plan_name = function () {
-    var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    var string_length = 10;
-    var randomstring = '';
-    for (var i = 0; i < string_length; i++) {
-        var rnum = Math.floor(Math.random() * chars.length);
-        randomstring += chars.substring(rnum, rnum + 1);
-    }
-    return randomstring;
-}
-
-
-EtherPlan.Helper.is_working_day = function (date) {
-    if (date.getDay() == 6 || date.getDay() == 0) {
-        return false;
-    } else {
-        return true;
-    }
-}
-
-EtherPlan.Helper.add_working_days = function (start, days) {
-    var stop = days;
-    var counted = 0;
-    var candidate = start;
-
-    while (counted < (stop - 1)) {
-        candidate = candidate.add(1, 'days');
-        if (EtherPlan.Helper.is_working_day(candidate)) {
-            counted++;
-        }
-    }
-    return candidate;
-}
-
-EtherPlan.Helper.format_date = function (date) {
-    var formatedDate = moment(date).format(EtherPlan.DATEFORMAT);
-    return formatedDate;
-}
-
-EtherPlan.Helper.update_finish = function (value, start, finish) {
-    var days = parseInt(value.value);
-    var start = Date.parseFormat(start.value, EtherPlan.DATEFORMAT);
-    var add = EtherPlan.Helper.add_working_days(start, days);
-    finish.value = EtherPlan.Helper.format_date(add);
-}
-
-EtherPlan.Helper.update_value = function (value, start, finish) {
-    var sDate = Date.parseFormat(start.value, EtherPlan.DATEFORMAT);
-    var fDate = Date.parseFormat(finish.value, EtherPlan.DATEFORMAT);
-
-    value.value = sDate.diff(fDate, 'businessdays') + 1;
-}
-
-EtherPlan.Helper.edit_update_finish = function () {
-    var value = document.getElementById('editValue');
-    var start = document.getElementById('editStart');
-    var finish = document.getElementById('editFinish');
-
-    EtherPlan.Helper.update_finish(value, start, finish);
-}
-
-EtherPlan.Helper.edit_update_value = function () {
-    var value = document.getElementById('editValue');
-    var start = document.getElementById('editStart');
-    var finish = document.getElementById('editFinish');
-
-    EtherPlan.Helper.update_value(value, start, finish);
-}
-
-EtherPlan.Helper.entry_update_finish = function () {
-    var value = document.getElementById('entryValue');
-    var start = document.getElementById('entryStart');
-    var finish = document.getElementById('entryFinish');
-
-    EtherPlan.Helper.update_finish(value, start, finish);
-}
-
-EtherPlan.Helper.entry_update_value = function () {
-    var value = document.getElementById('entryValue');
-    var start = document.getElementById('entryStart');
-    var finish = document.getElementById('entryFinish');
-
-    EtherPlan.Helper.update_value(value, start, finish);
-}
-
-// from: http://stackoverflow.com/questions/2808184/restricting-input-to-textbox-allowing-only-numbers-and-decimal-point
-EtherPlan.Helper.is_number_key = function (evt) {
-    var charCode = (evt.which) ? evt.which : event.keyCode
-    if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57)) return false;
-    return true;
-}
-
-// from: http://stackoverflow.com/questions/613114/little-x-in-textfield-input-on-the-iphone-in-mobilesafari
-EtherPlan.Helper.clear_input = function (id) {
-    $("#" + id).get(0).value = "";
-    return false;
-}
 
 // from: http://code.google.com/p/tesis-e/source/browse/trunk/vocab-editor/static/js/snippets.js
 EtherPlan.Helper.topological_sort = function (edges, nodes) {
@@ -641,7 +726,6 @@ EtherPlan.Helper.update_values = function () {
     var groups = [];
     var childs = [];
     var preds = [];
-
 
     // first find groups edges and fill nodes, labels, groups and childs arrays
     EtherPlan.Parts.find({
@@ -727,15 +811,15 @@ EtherPlan.Helper.update_values = function () {
 
         // predecessors move start and finish dates
         if (preds[part._id]) {
-            var dateStartP = Date.parseFormat(part.start, EtherPlan.DATEFORMAT);
+            var dateStartP = EtherPlan.Helper.parse_date(part.start);
             var arrPreds = preds[part._id];
             for (var k in arrPreds) {
                 EtherPlan.Helper.log("Compare dates " + labels[part._id] + " using preds " + labels[arrPreds[k]]);
 
                 var d = EtherPlan.Helper.get_part(arrPreds[k]);
-                var dateFinishD = Date.parseFormat(d.finish, EtherPlan.DATEFORMAT);
+                var dateFinishD = EtherPlan.Helper.parse_date(d.finish);
                 if (d.isGroup) {
-                    dateFinishD = Date.parseFormat(groups[arrPreds[k]].finish, EtherPlan.DATEFORMAT);
+                    dateFinishD = EtherPlan.Helper.parse_date(groups[arrPreds[k]].finish);
                 }
 
                 if (dateFinishD > dateStartP) {
@@ -763,11 +847,11 @@ EtherPlan.Helper.update_values = function () {
                 tPart = groups[part._id];
             }
 
-            var dateStartPart = Date.parseFormat(tPart.start, EtherPlan.DATEFORMAT);
-            var dateStartParent = Date.parseFormat(gParent.start, EtherPlan.DATEFORMAT);;
+            var dateStartPart = EtherPlan.Helper.parse_date(tPart.start);
+            var dateStartParent = EtherPlan.Helper.parse_date(gParent.start);
 
-            var dateFinishPart = Date.parseFormat(tPart.finish, EtherPlan.DATEFORMAT);;
-            var dateFinishParent = Date.parseFormat(gParent.finish, EtherPlan.DATEFORMAT);;
+            var dateFinishPart = EtherPlan.Helper.parse_date(tPart.finish);
+            var dateFinishParent = EtherPlan.Helper.parse_date(gParent.finish);
 
             if (!dateStartParent || dateStartPart < dateStartParent) {
                 EtherPlan.Helper.log("DATES START: " + labels[parent] + "->" + tPart.start + " " + gParent.start);
@@ -783,9 +867,7 @@ EtherPlan.Helper.update_values = function () {
 
     for (var k in groups) {
         var g = groups[k];
-        var sDate = Date.parseFormat(g.start, EtherPlan.DATEFORMAT);
-        var fDate = Date.parseFormat(g.finish, EtherPlan.DATEFORMAT);
-        var newValue = sDate.diff(fDate, 'businessdays') + 1;
+        var newValue = EtherPlan.Helper.diff_dates_working_days(g.start, g.finish);
 
         EtherPlan.Helper.set_part_value(k, "start", g.start);
         EtherPlan.Helper.set_part_value(k, "finish", g.finish);
