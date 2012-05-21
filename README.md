@@ -2,7 +2,7 @@
 
 Allow planning in real time, with people working together, remotly over a web space, using meteor technology.
 
-# ToDo
+## ToDo
 
 * Search cycles predecessors
 * Add fields resource, description, etc
