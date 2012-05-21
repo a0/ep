@@ -27,7 +27,7 @@ Template.table.parts = function () {
         sort: {
             order: 1
         }
-    });;
+    });
 };
 
 Template.table.hasDoc = function () {

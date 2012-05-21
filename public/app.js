@@ -29,7 +29,8 @@ $(function () {
                     element.data('lastPrev', element.prev());
                 },
                 opacity: '.5',
-                handle: '.showOrder'
+                handle: '.showOrder',
+                axis: 'y'
             }).disableSelection();
         }
 

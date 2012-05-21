@@ -12,7 +12,7 @@ EtherPlan.Action = {};
 EtherPlan.ENTER_KEY = 13;
 EtherPlan.LEVELSPACE = 4;
 EtherPlan.DATEFORMAT = "YYYY-MM-DD";
-EtherPlan.DEBUG = true;
+EtherPlan.DEBUG = false;
 
 Session.set('editing_part', null);
 Session.set('adding_part', null);
@@ -92,7 +92,6 @@ EtherPlan.Helper.add_working_days = function (mStart, days) {
     var stop = days;
     var counted = 0;
     var candidate = moment(mStart);
-    candidate.setHours(10);
 
     while (counted < (stop - 1)) {
         candidate = candidate.add('d', 1);
