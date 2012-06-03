@@ -29,12 +29,6 @@ Session.set('show_debug', true);
 
 
 
-
-
-
-
-
-
 // from meteor samples
 EtherPlan.Helper.okcancel_events = function (selector) {
     return 'keyup ' + selector + ', keydown ' + selector;
@@ -108,7 +102,6 @@ EtherPlan.Helper.format_date = function (m) {
     return m.format(EtherPlan.DATEFORMAT);
 }
 
-
 EtherPlan.Helper.parse_date = function (str) {
     return moment(str, EtherPlan.DATEFORMAT);
 }
@@ -129,17 +122,6 @@ EtherPlan.Helper.diff_dates_working_days = function (strDateStart, strDateFinish
     }
     return count;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -322,16 +304,6 @@ EtherPlan.Helper.size_tree = function (partId) {
 
 
 
-
-
-
-
-
-
-
-
-
-
 EtherPlan.Helper.update_finish = function (value, start, finish) {
     var days = parseInt(value.value);
     var start = EtherPlan.Helper.parse_date(start.value);
@@ -374,12 +346,6 @@ EtherPlan.Helper.entry_update_value = function () {
 
     EtherPlan.Helper.update_value(value, start, finish);
 }
-
-
-
-
-
-
 
 
 
@@ -664,8 +630,6 @@ EtherPlan.Helper.move_part = function (oldOrder, newOrder) {
     EtherPlan.Helper.update_values();
 }
 
-
-
 // from: http://code.google.com/p/tesis-e/source/browse/trunk/vocab-editor/static/js/snippets.js
 EtherPlan.Helper.topological_sort = function (edges, nodes) {
     var L = [];
@@ -718,6 +682,7 @@ EtherPlan.Helper.topological_sort = function (edges, nodes) {
     return L;
 }
 // end from: http://code.google.com/p/tesis-e/source/browse/trunk/vocab-editor/static/js/snippets.js 
+
 EtherPlan.Helper.update_values = function () {
     var edges = [];
     var nodes = [];
@@ -804,9 +769,8 @@ EtherPlan.Helper.update_values = function () {
         EtherPlan.Helper.log("Topological sort: " + labels[list[n]]);
 
         var part = EtherPlan.Helper.get_part(list[n]);
-        var parent = part.parent;
-
         var tPart = part;
+        var parent = part.parent;
 
         // predecessors move start and finish dates
         if (preds[part._id]) {
@@ -821,11 +785,13 @@ EtherPlan.Helper.update_values = function () {
                     dateFinishD = EtherPlan.Helper.parse_date(groups[arrPreds[k]].finish);
                 }
 
-                if (dateFinishD > dateStartP) {
-                    dateStartP = dateFinishD;
+                var dateNextStartP = EtherPlan.Helper.add_working_days(dateFinishD,2);
+                if (dateNextStartP > dateStartP) {
 
-                    var add = EtherPlan.Helper.add_working_days(dateStartP, part.value);
-                    var newStart = EtherPlan.Helper.format_date(dateStartP);
+                    dateStartP = dateNextStartP;
+                    
+                    var add = EtherPlan.Helper.add_working_days(dateNextStartP, part.value);
+                    var newStart = EtherPlan.Helper.format_date(dateNextStartP);
                     var newFinish = EtherPlan.Helper.format_date(add);
                     EtherPlan.Helper.set_part_value(part._id, "start", newStart);
                     EtherPlan.Helper.set_part_value(part._id, "finish", newFinish);
