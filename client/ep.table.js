@@ -49,7 +49,7 @@ Template.table.noParts = function () {
 }
 
 Handlebars.registerHelper('spaceLabel', function (part) {
-    var numSpaces = EtherPlan.LEVELSPACE * part.level;
+    var numSpaces = EtherPlan.Config.LEVELSPACE * part.level;
     var strSpaces = "";
     for (var i = 0; i < numSpaces; i++) {
         strSpaces += "&nbsp;";
@@ -64,10 +64,10 @@ Handlebars.registerHelper('depend', function (part) {
 
 
 Handlebars.registerHelper('spaceLabelEntry', function (part) {
-    var numSpaces = EtherPlan.LEVELSPACE * part.level;
+    var numSpaces = EtherPlan.Config.LEVELSPACE * part.level;
     var strSpaces = "";
     if (Session.equals('adding_part', this._id)) {
-        numSpaces += EtherPlan.LEVELSPACE;
+        numSpaces += EtherPlan.Config.LEVELSPACE;
     }
     for (var i = 0; i < numSpaces; i++) {
         strSpaces += "&nbsp;";

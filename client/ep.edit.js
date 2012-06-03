@@ -160,7 +160,7 @@ Template.edit.couldDown = function () {
 };
 
 Template.edit.couldDebug = function () {
-    return EtherPlan.DEBUG;
+    return EtherPlan.Config.DEBUG;
 }
 
 Template.edit.couldUp = function () {
